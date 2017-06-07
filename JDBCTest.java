@@ -7,7 +7,7 @@ import java.util.*;
 import java.io.*;
 import java.lang.*;
 
-public class JDBCTestMysql1 {
+public class JDBCTest {
     
     private static Connection conn;
     private static int target = 1;
