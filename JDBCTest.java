@@ -24,13 +24,14 @@ public class JDBCTest {
 			System.out.println("Driver not found");
 			System.out.println(ex);
 		}
-		;
 
+		String ticker = args[1];
+		
 		conn = openConnection();
 		
 		try {
 			Statement test = conn.createStatement();
-			String t=  "SELECT * FROM Securities WHERE ticker='GOOG'";
+			String t=  "SELECT * FROM Securities WHERE ticker='"+ticker+"'";
 			ResultSet r = test.executeQuery(t);
 			boolean f = r.next();
 			while (f) {
@@ -41,7 +42,6 @@ public class JDBCTest {
 			}
 			
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -65,8 +65,7 @@ public class JDBCTest {
 			System.out.println("credentials not found");
 			System.out.println(e);
 		}
-		
-		//TODO might be username instead
+
 		String url = "jdbc:mysql://cslvm74.csc.calpoly.edu/" + database + "?";
 
 		try {
