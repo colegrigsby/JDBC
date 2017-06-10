@@ -73,7 +73,6 @@ public class JDBCTest {
 		
 		return c; 
 	}
->>>>>>> 41c192afaa09fd0d41bcd615fb0e90125950f054
 
 }
 
