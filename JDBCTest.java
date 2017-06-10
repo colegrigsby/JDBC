@@ -26,6 +26,20 @@ public class JDBCTest {
 		}
 		;
 
+		String url = "jdbc:mysql://cslvm74.csc.calpoly.edu/cegrigsb?";
+
+		conn = null;
+		try {
+			conn = DriverManager.getConnection(url, "cegrigsb", "NiceTryButNotToday!@#$");
+			//conn = DriverManager.getConnection(url + "user=testuser&password=abc123&");
+
+		} catch (Exception ex) {
+			System.out.println("Could not open connection");
+			System.out.println(ex);
+		}
+		;
+
+		System.out.println("Connected");
 
 		conn = openConnection();
 		
