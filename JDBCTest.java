@@ -26,27 +26,20 @@ public class JDBCTest {
 		}
 		;
 
-		String url = "jdbc:mysql://cslvm74.csc.calpoly.edu/cegrigsb?";
-
-		conn = null;
-		try {
-			//conn = DriverManager.getConnection(url, "cegrigsb", "NiceTryButNotToday!@#$");
-			conn = DriverManager.getConnection(url + "user=cegrigsb&password=NiceTryButNotToday!@#$");
-
-		} catch (Exception ex) {
-			System.out.println("Could not open connection");
-			System.out.println(ex);
-		}
-		;
-
-		System.out.println("Connected");
-
 		conn = openConnection();
 		
 		try {
 			Statement test = conn.createStatement();
 			String t=  "SELECT * FROM Securities WHERE ticker='GOOG'";
 			ResultSet r = test.executeQuery(t);
+			boolean f = r.next();
+			while (f) {
+				String s = r.getString(1);
+				String a = r.getString(2);
+				System.out.println(s + ", " + a);
+				f = r.next();
+			}
+			
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
