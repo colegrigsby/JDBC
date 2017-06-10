@@ -1,0 +1,91 @@
+-- GENERAL 
+
+
+-- Q4 
+
+-- up ratio 
+SELECT * FROM 
+
+(SELECT ticker, SUM(up), SUM(down), SUM(up)/SUM(down)
+FROM (SELECT ticker, IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down
+	FROM AdjustedPrices WHERE YEAR(day)=2016 GROUP BY ticker, day) a
+GROUP BY ticker) a
+LEFT OUTER JOIN 
+(SELECT ticker, SUM(up), SUM(down), SUM(up)/SUM(down)
+FROM (SELECT ticker, DAY(day), IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down
+	FROM AdjustedPrices WHERE YEAR(day)<2016 GROUP BY ticker, day) a
+GROUP BY ticker) b USING (ticker) 
+;
+
+
+
+
+
+
+
+-- IND 
+
+
+
+
+-- Q1 
+
+SELECT MIN(day), MAX(day) FROM Prices WHERE ticker='GOOG';
+
+-- Q2 
+SELECT YEAR(Day) as year, SUM(volume), AVG(close), AVG(volume) 
+FROM AdjustedPrices 
+WHERE Ticker='GOOG' 
+
+GROUP BY year ;
+
+-- TODO get the "increase/decrease in prices year-over-year" 
+
+-- Q3 
+
+-- TODO last full YEAR for which data exists 
+
+SELECT AVG(close), IF(MIN(close)<MIN(open), MIN(close), MIN(open)),
+	IF(MAX(open)>MAX(close), MAX(open), MAX(close))
+FROM AdjustedPrices 
+WHERE Ticker='GOOG' and Year(day)=2016 
+; 
+
+
+SELECT MONTH(Day) as m, AVG(volume) 
+FROM AdjustedPrices 
+WHERE Ticker='GOOG' 
+GROUP BY m; 
+
+
+-- Q4 
+
+-- use values and determine 
+
+SELECT YEAR(Day) as year, MONTH(Day) as month, SUM(Volume), 
+	(SUM(Volume) - a.av) / a.st , AVG(close), (AVG(Close) - b.av) / b.st
+FROM AdjustedPrices, (
+SELECT x1.y, STDDEV(v) as st, AVG(v) as av 
+	FROM (SELECT YEAR(day) as y, MONTH(day) as m, SUM(Volume) 
+	as v FROM AdjustedPrices WHERE ticker='GOOG' GROUP BY y, m) x1
+	GROUP BY x1.y
+	
+) a, 
+(SELECT x2.y, STDDEV(c) as st, AVG(c) as av 
+	FROM (SELECT YEAR(day) as y, MONTH(day) as m, AVG(close) 
+	as c FROM AdjustedPrices WHERE ticker='GOOG' GROUP BY y, m) x2
+	GROUP BY x2.y
+) b
+WHERE Ticker='GOOG' and a.y=YEAR(Day) and b.y=YEAR(day)
+GROUP BY year, month;
+	
+	
+
+SELECT y, m, SUM(up), SUM(down), SUM(up)/SUM(down)
+FROM (SELECT YEAR(day) as y, MONTH(day) as m, DAY(day), IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down
+	FROM AdjustedPrices WHERE ticker='GOOG' GROUP BY y, m, DAY(day)) a
+GROUP BY y, m
+;
+
+-- from the above two queries, create a score by summing the standardized values and ratios 
+
