@@ -30,8 +30,8 @@ public class JDBCTest {
 
 		conn = null;
 		try {
-			conn = DriverManager.getConnection(url, "cegrigsb", "NiceTryButNotToday!@#$");
-			//conn = DriverManager.getConnection(url + "user=testuser&password=abc123&");
+			//conn = DriverManager.getConnection(url, "cegrigsb", "NiceTryButNotToday!@#$");
+			conn = DriverManager.getConnection(url + "user=cegrigsb&password=NiceTryButNotToday!@#$");
 
 		} catch (Exception ex) {
 			System.out.println("Could not open connection");
