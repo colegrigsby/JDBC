@@ -4,23 +4,92 @@
 -- Q4 
 
 -- up ratio 
-SELECT * FROM 
+SELECT ticker, a.r, b.r, a.r-b.r FROM 
 
-(SELECT ticker, SUM(up), SUM(down), SUM(up)/SUM(down)
+(SELECT ticker, SUM(up), SUM(down), SUM(up)/SUM(down) as r
 FROM (SELECT ticker, IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down
 	FROM AdjustedPrices WHERE YEAR(day)=2016 GROUP BY ticker, day) a
 GROUP BY ticker) a
 LEFT OUTER JOIN 
-(SELECT ticker, SUM(up), SUM(down), SUM(up)/SUM(down)
+(SELECT ticker, SUM(up), SUM(down), SUM(up)/SUM(down) as r
 FROM (SELECT ticker, DAY(day), IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down
 	FROM AdjustedPrices WHERE YEAR(day)<2016 GROUP BY ticker, day) a
 GROUP BY ticker) b USING (ticker) 
 ;
 
+-- standardized volume 2016 - previous 
+
+SELECT ticker, a.stv, b.stv, a.stv-b.stv
+FROM
+(SELECT ticker, SUM(Volume), (SUM(Volume) - a.av) / a.st as stv
+FROM (SELECT STDDEV(v) as st, AVG(v) as av 
+        FROM (SELECT SUM(Volume) as v 
+            FROM AdjustedPrices
+            WHERE YEAR(day)=2016 
+            GROUP BY ticker) x1	
+      ) a, AdjustedPrices
+WHERE YEAR(day)=2016
+GROUP BY ticker) a
+
+LEFT OUTER JOIN 
+	
+(SELECT ticker, SUM(Volume), (SUM(Volume) - a.av) / a.st as stv
+FROM (SELECT STDDEV(v) as st, AVG(v) as av 
+        FROM (SELECT SUM(Volume) as v 
+            FROM AdjustedPrices
+            WHERE YEAR(day)<2016 
+            GROUP BY ticker) x1	
+      ) a, AdjustedPrices
+WHERE YEAR(day)<2016
+GROUP BY ticker) b USING(ticker) 
+;
+
+
+-- semi-standardized price change over the year 2016
+
+SELECT Y.Ticker, (P2.close-P1.open) / P2.close as inc2016
+    FROM (SELECT Ticker, MIN(Day) AS Min, MAX(Day) AS Max
+        FROM AdjustedPrices P
+        WHERE YEAR(Day)=2016
+        GROUP BY Ticker) as Y, AdjustedPrices P1, AdjustedPrices P2
+    WHERE P1.Day = Y.Min
+        AND P2.Day = Y.Max
+        AND P1.Ticker = Y.Ticker
+        AND P2.Ticker = Y.Ticker 
 
 
 
+-- price increasing differences between the two years 
+SELECT Ticker, inc2016, inc2015, inc2016-inc2015 FROM 
 
+(SELECT Y.Ticker, P2.close-P1.open as inc2016
+FROM (SELECT Ticker, MIN(Day) AS Min, MAX(Day) AS Max
+    FROM AdjustedPrices P
+    WHERE YEAR(Day)=2016
+    GROUP BY Ticker) as Y, AdjustedPrices P1, AdjustedPrices P2
+WHERE P1.Day = Y.Min
+    AND P2.Day = Y.Max
+    AND P1.Ticker = Y.Ticker
+    AND P2.Ticker = Y.Ticker) a
+ 
+ 
+   
+LEFT OUTER JOIN 
+
+(SELECT Y.Ticker, P2.close-P1.open as inc2015
+FROM (SELECT Ticker, MIN(Day) AS Min, MAX(Day) AS Max
+    FROM AdjustedPrices P
+    WHERE YEAR(Day)=2015
+    GROUP BY Ticker) as Y, AdjustedPrices P1, AdjustedPrices P2
+WHERE P1.Day = Y.Min
+    AND P2.Day = Y.Max
+    AND P1.Ticker = Y.Ticker 
+    AND P2.Ticker = Y.Ticker) b USING(Ticker) 
+    
+;
+
+
+-- add ratios and change in price to get a score 
 
 
 -- IND 
