@@ -25,7 +25,7 @@ public class JDBCTest {
 			System.out.println(ex);
 		}
 
-		String ticker = args[1];
+		String ticker = args[0];
 		
 		conn = openConnection();
 		
