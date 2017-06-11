@@ -23,7 +23,10 @@ public class JDBC {
 
 		String ticker = args[0];
 		
+		
 		conn = openConnection();
+		
+		runAndWrite(conn, ticker);
 		
 		try {
 			Statement test = conn.createStatement();
@@ -36,7 +39,7 @@ public class JDBC {
 				System.out.println(s + ", " + a);
 				f = r.next();
 			}
-			System.out.println(Report.topTable("2016 Top Traded", Arrays.asList("Ticker", "Name"), Selector.GenQuery2(conn)).render());
+			//System.out.println(topTable("2016 Top Traded", Arrays.asList("Ticker", "Name"), Selector.GenQuery2(conn)).render());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -73,6 +76,16 @@ public class JDBC {
 		}
 		
 		return c; 
+	}
+	
+	public static void runAndWrite(Connection conn, String ticker){
+		Report r = new Report(ticker);
+		
+		r.info(Selector.GenQuery1_1(conn), Selector.GenQuery1_2(conn),
+				Selector.GenQuery1_3(conn), Selector.GenQuery1_4(conn));
+		
+		r.writeFile();
+		
 	}
 
 }

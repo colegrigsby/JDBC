@@ -53,25 +53,25 @@ public class Selector {
         return returnList; 
     }
 
-    public static ArrayList<ArrayList<String>> GenQuery1_1(Connection conn) {
+    public static String GenQuery1_1(Connection conn) {
         String query = 
             "SELECT SUM(Volume)"
             + " FROM Prices"
             + " WHERE YEAR(Day) < 2016;";
 
-        return execQuery(conn, query, 1);
+        return execQuery(conn, query, 1).get(0).get(0);
     }
 
-    public static ArrayList<ArrayList<String>> GenQuery1_2(Connection conn) {
+    public static String GenQuery1_2(Connection conn) {
         String query =
             "SELECT SUM(Volume)"
             + " FROM Prices"
             + " WHERE YEAR(Day) < 2017;";
 
-        return execQuery(conn, query, 1);
+        return execQuery(conn, query, 1).get(0).get(0);
     }
 
-    public static ArrayList<ArrayList<String>> GenQuery1_3(Connection conn) {
+    public static String GenQuery1_3(Connection conn) {
         String query =
             "SELECT COUNT(*)"
             + " FROM (SELECT Ticker, Close"
@@ -89,10 +89,10 @@ public class Selector {
             + " WHERE AP1.Ticker = AP2.Ticker"
             + " AND AP1.Close < AP2.Close;";
 
-        return execQuery(conn, query, 1);
+        return execQuery(conn, query, 1).get(0).get(0);
     }
 
-    public static ArrayList<ArrayList<String>> GenQuery1_4(Connection conn) {
+    public static String GenQuery1_4(Connection conn) {
         String query =
             "SELECT COUNT(*)"
             + " FROM (SELECT Ticker, Close"
@@ -110,7 +110,7 @@ public class Selector {
             + " WHERE AP1.Ticker = AP2.Ticker"
             + " AND AP1.Close > AP2.Close;";
 
-        return execQuery(conn, query, 1);
+        return execQuery(conn, query, 1).get(0).get(0);
     }
 
     public static ArrayList<ArrayList<String>> GenQuery2(Connection conn) {
