@@ -360,7 +360,7 @@ JOIN
                 WHERE  YEAR(day)=2016
                 GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2
             WHERE P1.Day = Y.Min
-            AND P2.Day = Y.Max
+            AND P2.Day = Y.Max AND P1.Ticker=P2.Ticker
             ORDER BY (P2.close-P1.open)/P1.open
             LIMIT 5 ) b
     USING(ticker)
@@ -374,4 +374,21 @@ USING (month)
 
 -- better trading stock compared to : 
 
+SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, "Inc", "dec") as inc, vol
+        FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol
+            FROM AdjustedPrices P
+            WHERE Ticker='GOOG' and YEAR(day)=2016
+            GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2
+        WHERE P1.Day = Y.Min
+        AND P2.Day = Y.Max
+        AND P1.Ticker='GOOG' and P2.Ticker='GOOG';
+
+SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, "Inc", "dec") as inc, vol
+        FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol
+            FROM AdjustedPrices P
+            WHERE Ticker='UAL' and YEAR(day)=2016
+            GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2
+        WHERE P1.Day = Y.Min
+        AND P2.Day = Y.Max
+        AND P1.Ticker='UAL' and P2.Ticker='UAL';
 
