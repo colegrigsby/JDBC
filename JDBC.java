@@ -81,8 +81,24 @@ public class JDBC {
 	public static void runAndWrite(Connection conn, String ticker){
 		Report r = new Report(ticker);
 		
+		//1 
 		r.info(Selector.GenQuery1_1(conn), Selector.GenQuery1_2(conn),
 				Selector.GenQuery1_3(conn), Selector.GenQuery1_4(conn));
+		
+		//2 
+		List<String> head = Arrays.asList("Ticker", "Name");
+		r.topTable("Most Heavily Traded 2016 Stocks", head, Selector.GenQuery2(conn));
+		
+		//3 
+		//TODO r.topFivePerYear(Selector.GenQuery3(conn));
+		
+		// 4
+		head = Arrays.asList("Ticker", "NAME TOFIX");
+		r.topTable("Top Ten Stocks to Watch in 2017", head, Selector.GenQuery4(conn));
+		
+		// 5 
+		
+		
 		
 		r.writeFile();
 		
