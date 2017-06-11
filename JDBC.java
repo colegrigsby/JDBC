@@ -99,6 +99,32 @@ public class JDBC {
 		// 5 
 		
 		
+		// 1 
+		//TODO r.dateInfo(start, end);
+		
+		// 2
+		head = Arrays.asList("Year", "Increase", "Volume", "Average Closing", 
+				"Average Daily Trade Volume");
+		//r.top(name, head, labels)
+		
+		//3 
+		//r.byYearInfo(years, data);
+		
+		//4 
+		//head = Arrays.asList("Year", "Month");
+		//r.byYearBestMonth(name, head, labels)
+		
+		//5 
+		//r.predictions(data);
+		
+		// 6
+		//r.outcomes(data);
+		
+		//7
+		//r.compareTop(year, data);
+		
+		// 8
+		//r.compareNearby(year, data);
 		
 		r.writeFile();
 		
