@@ -36,11 +36,10 @@ public class JDBC {
 				System.out.println(s + ", " + a);
 				f = r.next();
 			}
-			
+			System.out.println(Report.topTable("2016 Top Traded", Arrays.asList("Ticker", "Name"), Selector.GenQuery2(conn)).render());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 	
 	private static Connection openConnection() {
