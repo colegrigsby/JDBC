@@ -1,4 +1,4 @@
-javac JDBCTest.java
-java -cp ./mysql-connector-java-5.1.18-bin.jar:. JDBCTest GOOG
+javac JDBC.java
+java -cp ./mysql-connector-java-5.1.18-bin.jar:. JDBC GOOG
 
 
