@@ -30,7 +30,7 @@ public class Selector {
         return returnList; 
     }
 
-    public static ArrayList<ArrayList<String>> execQuery(PreparedStatement statement, int columns) {
+    public static ArrayList<ArrayList<String>> execPrepQuery(PreparedStatement statement, int columns) {
         ArrayList<ArrayList<String>> returnList = new ArrayList<ArrayList<String>>();
 
         try {
@@ -53,20 +53,97 @@ public class Selector {
         return returnList; 
     }
 
+    public static ArrayList<ArrayList<String>> tickerQuery(Connection conn, String query, int columns, String ticker, int tickCnt) {
+        ArrayList<ArrayList<String>> returnList = new ArrayList<ArrayList<String>>();
+
+        try {
+            PreparedStatement statement = conn.prepareStatement(query);
+            for (int i = 0; i < tickCnt; i++) {
+                statement.setString(i + 1, ticker);
+            }
+            return execPrepQuery(statement, columns);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new  ArrayList<ArrayList<String>>();
+    }
+
+    public static ArrayList<ArrayList<String>> dateQuery(Connection conn, String query, int columns, String ticker, String date) {
+        ArrayList<ArrayList<String>> returnList = new ArrayList<ArrayList<String>>();
+
+        try {
+            PreparedStatement statement = conn.prepareStatement(query);
+            
+            statement.setString(1, ticker);
+            statement.setString(2, date);
+            statement.setString(3, date);
+
+            return execPrepQuery(statement, columns);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new  ArrayList<ArrayList<String>>();
+    }
+
+    public static String getFullYear(Connection conn, String ticker) {
+        String query =
+            "SELECT year"
+            + " FROM (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " WHERE Ticker=?"
+            + " GROUP BY year) a"
+            + " WHERE MONTH(Min)=1 and MONTH(Max)=12"
+            + " ORDER BY year DESC"
+            + " LIMIT 1;";
+
+        return tickerQuery(conn, query, 1, ticker, 1).get(0).get(0);
+    }
+
+    public static String getFullYearTwoStock(Connection conn, String ticker1, String ticker2) {
+        String query =
+            "SELECT year"
+            + " FROM (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " WHERE Ticker=?"
+            + " GROUP BY year) a"
+            + " JOIN"
+            + " (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " WHERE Ticker=?"
+            + " GROUP BY year) b"
+            + " USING (year, Min, Max)"
+            + " WHERE MONTH(Min)=1 and MONTH(Max)=12"
+            + " ORDER BY year DESC"
+            + " LIMIT 1;";
+
+        try {
+            PreparedStatement statement = conn.prepareStatement(query);
+
+            statement.setString(1, ticker1);
+            statement.setString(2, ticker2);
+
+            return execPrepQuery(statement, 1).get(0).get(0);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+
     public static String GenQuery1_1(Connection conn) {
         String query = 
-            "SELECT SUM(Volume)"
-            + " FROM Prices"
-            + " WHERE YEAR(Day) < 2016;";
+            "SELECT COUNT(*)"
+            + " FROM Securities"
+            + " WHERE YEAR(StartDate) < 2016;";
 
         return execQuery(conn, query, 1).get(0).get(0);
     }
 
     public static String GenQuery1_2(Connection conn) {
         String query =
-            "SELECT SUM(Volume)"
-            + " FROM Prices"
-            + " WHERE YEAR(Day) < 2017;";
+            "SELECT COUNT(*)"
+            + " FROM Securities"
+            + " WHERE YEAR(StartDate) < 2017;";
 
         return execQuery(conn, query, 1).get(0).get(0);
     }
@@ -132,12 +209,12 @@ public class Selector {
         return execQuery(conn, query, 2);
     }
 
-    public static ArrayList<ArrayList<String>> GenQuery3(Connection conn) {
+    public static ArrayList<ArrayList<String>> GenQuery3_1(Connection conn) {
         String query =
             "SELECT Y.Year, Y.Ticker, S.Name"
             + " FROM (SELECT Ticker, YEAR(Day) AS Year, MIN(Day) AS Min, MAX(Day) AS Max"
             + " FROM Prices P"
-            + " GROUP BY Ticker, YEAR(Day)) as Y, Prices P1, Prices P2, Securities S"
+            + " GROUP BY Ticker, YEAR(Day)) Y, Prices P1, Prices P2, Securities S"
             + " WHERE P1.Day = Y.Min"
             + " AND P2.Day = Y.Max"
             + " AND P1.Ticker = Y.Ticker"
@@ -149,6 +226,34 @@ public class Selector {
             + " MIN(Day) AS Min, MAX(Day) AS Max"
             + " FROM Prices P"
             + " GROUP BY Ticker, YEAR(Day)) as Y1, Prices P3, Prices P4"
+            + " WHERE P3.Day = Y1.Min"
+            + " AND P4.Day = Y1.Max"
+            + " AND P3.Ticker = Y1.Ticker"
+            + " AND P4.Ticker = Y1.Ticker"
+            + " AND Y1.Year = Y.Year"
+            + " AND (P2.Close - P1.Open) <= (P4.Close - P3.Open))"
+            + " ORDER BY Y.Year, Y.Ticker;";
+
+        return execQuery(conn, query, 3);
+    }
+
+    public static ArrayList<ArrayList<String>> GenQuery3_2(Connection conn) {
+        String query =
+            "SELECT Y.Year, Y.Ticker, S.Name"
+            + " FROM (SELECT Ticker, YEAR(Day) AS Year, MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " GROUP BY Ticker, YEAR(Day)) Y, AdjustedPrices P1, AdjustedPrices P2, Securities S"
+            + " WHERE P1.Day = Y.Min"
+            + " AND P2.Day = Y.Max"
+            + " AND P1.Ticker = Y.Ticker"
+            + " AND P2.Ticker = Y.Ticker"
+            + " AND S.Ticker = Y.Ticker"
+            + " AND 5 >="
+            + " (SELECT COUNT(*)"
+            + " FROM (SELECT Ticker, YEAR(Day) AS Year,"
+            + " MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " GROUP BY Ticker, YEAR(Day)) as Y1, AdjustedPrices P3, AdjustedPrices P4"
             + " WHERE P3.Day = Y1.Min"
             + " AND P4.Day = Y1.Max"
             + " AND P3.Ticker = Y1.Ticker"
@@ -273,4 +378,313 @@ public class Selector {
 
         return execQuery(conn, query, 3);
     }
+
+    public static ArrayList<ArrayList<String>> IndivQuery1(Connection conn, String ticker) {
+        String query =
+            "SELECT MIN(day), MAX(day) FROM Prices WHERE ticker=?;";
+        return tickerQuery(conn, query, 2, ticker, 1);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery2_1(Connection conn, String ticker) {
+        String query =
+            "SELECT YEAR(Day) as year, SUM(volume), AVG(close), AVG(volume)"
+            + " FROM AdjustedPrices"
+            + " WHERE Ticker=?"
+            + " GROUP BY year;";
+
+        return tickerQuery(conn, query, 4, ticker, 1);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery2_2(Connection conn, String ticker) {
+        String query =
+            "SELECT Y.year, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc"
+            + " FROM (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " WHERE Ticker=?"
+            + " GROUP BY year) as Y, AdjustedPrices P1, AdjustedPrices P2"
+            + " WHERE P1.Day = Y.Min"
+            + " AND P2.Day = Y.Max"
+            + " AND P1.Ticker=? and P2.Ticker=?;";
+
+        return tickerQuery(conn, query, 3, ticker, 3);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery3_1(Connection conn, String ticker) {
+        String query =
+            "SELECT AVG(close), IF(MIN(close)<MIN(open), MIN(close), MIN(open)),"
+            + " IF(MAX(open)>MAX(close), MAX(open), MAX(close))"
+            + " FROM AdjustedPrices"
+            + " WHERE Ticker=? and Year(day)=2016;";
+
+        return tickerQuery(conn, query, 3, ticker, 1);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery3_2(Connection conn, String ticker) {
+        String query =
+            "SELECT MONTH(Day) as m, AVG(volume)"
+            + " FROM AdjustedPrices"
+            + " WHERE Ticker=?"
+            + " GROUP BY m;";
+
+        return tickerQuery(conn, query, 2, ticker, 1);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery4(Connection conn, String ticker) {
+        String query =
+            "SELECT year, month"
+            + " FROM"
+            + " (SELECT year, month, STDC+STDV+UPRATIO as score "
+            + " "
+            + " FROM "
+            + " (SELECT YEAR(Day) as year, MONTH(Day) as month, "
+            + " (SUM(Volume) - a.av) / a.st as STDV,  (AVG(Close) - b.av) / b.st as STDC"
+            + " FROM AdjustedPrices, ("
+            + " SELECT x1.y, STDDEV(v) as st, AVG(v) as av "
+            + " FROM (SELECT YEAR(day) as y, MONTH(day) as m, SUM(Volume) "
+            + " as v FROM AdjustedPrices WHERE ticker=? GROUP BY y, m) x1"
+            + " GROUP BY x1.y"
+            + " "
+            + " ) a, "
+            + " (SELECT x2.y, STDDEV(c) as st, AVG(c) as av "
+            + " FROM (SELECT YEAR(day) as y, MONTH(day) as m, AVG(close) "
+            + " as c FROM AdjustedPrices WHERE ticker=? GROUP BY y, m) x2"
+            + " GROUP BY x2.y"
+            + " ) b"
+            + " WHERE Ticker=? and a.y=YEAR(Day) and b.y=YEAR(day)"
+            + " GROUP BY year, month) a"
+            + " "
+            + " JOIN "
+            + " "
+            + " (SELECT year, month, SUM(up), SUM(down), SUM(up)/SUM(down) as UPRATIO"
+            + " FROM (SELECT YEAR(day) as year, MONTH(day) as month, DAY(day), IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down"
+            + " FROM AdjustedPrices WHERE ticker=? GROUP BY year, month, DAY(day)) a"
+            + " GROUP BY year, month) b"
+            + " "
+            + " USING (year, month) "
+            + " "
+            + " "
+            + " "
+            + " GROUP BY year, month"
+            + " ORDER BY year, score DESC) t"
+            + " WHERE score >= ALL"
+            + " (SELECT STDC+STDV+UPRATIO as score "
+            + " "
+            + " FROM "
+            + " (SELECT YEAR(Day) as year, MONTH(Day) as month, "
+            + " (SUM(Volume) - a.av) / a.st as STDV,  (AVG(Close) - b.av) / b.st as STDC"
+            + " FROM AdjustedPrices, ("
+            + " SELECT x1.y, STDDEV(v) as st, AVG(v) as av "
+            + " FROM (SELECT YEAR(day) as y, MONTH(day) as m, SUM(Volume) "
+            + " as v FROM AdjustedPrices WHERE ticker=? GROUP BY y, m) x1"
+            + " GROUP BY x1.y"
+            + " "
+            + " ) a, "
+            + " (SELECT x2.y, STDDEV(c) as st, AVG(c) as av "
+            + " FROM (SELECT YEAR(day) as y, MONTH(day) as m, AVG(close) "
+            + " as c FROM AdjustedPrices WHERE ticker=? GROUP BY y, m) x2"
+            + " GROUP BY x2.y"
+            + " ) b"
+            + " WHERE Ticker=? and a.y=YEAR(Day) and b.y=YEAR(day)"
+            + " GROUP BY year, month) a"
+            + " "
+            + " JOIN "
+            + " "
+            + " (SELECT year, month, SUM(up), SUM(down), SUM(up)/SUM(down) as UPRATIO"
+            + " FROM (SELECT YEAR(day) as year, MONTH(day) as month, DAY(day), IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down"
+            + " FROM AdjustedPrices WHERE ticker=? GROUP BY year, month, DAY(day)) a"
+            + " GROUP BY year, month) b"
+            + " "
+            + " USING (year, month) "
+            + " "
+            + " WHERE t.year=year"
+            + " "
+            + " GROUP BY year, month"
+            + " ORDER BY year, score DESC)"
+            + " "
+            + " ORDER BY year "
+            + " ;";
+
+        return tickerQuery(conn, query, 2, ticker, 7);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery5_1(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT SUM(up) as upDays, SUM(down) as downDays, SUM(up)/SUM(down) as UPRATIO"
+            + " FROM (SELECT day, IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=? and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<?"
+            + " GROUP BY day) a;";
+
+        return dateQuery(conn, query, 3, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery5_2(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT SUM(close-open)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<?"
+            + " ;";
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery5_3(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT SUM(close-open)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day>=DATE_SUB(?, INTERVAL 60 DAY) and day<DATE_SUB(?, INTERVAL 30 DAY)"
+            + " ;";
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery5_4(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT MAX(high)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<?"
+            + " ;";
+
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery5_5(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT MAX(high)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<DATE_SUB(?, INTERVAL 30 DAY)"
+            + " ;";
+
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery5_6(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT MAX(high)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day>=DATE_SUB(?, INTERVAL 365 DAY) and day<?"
+            + " ;";
+
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery6_1(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT SUM(close-open)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day<=DATE_ADD(?, INTERVAL 90 DAY) and day>?"
+            + " ;";
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery6_2(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT SUM(close-open)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day<=DATE_ADD(?, INTERVAL 180 DAY) and day>DATE_ADD(?, INTERVAL 90 DAY)"
+            + " ;";
+
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery6_3(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT SUM(close-open)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day<=DATE_ADD(?, INTERVAL 180 DAY) and day>?"
+            + " ;";
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery6_4(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT MAX(high)"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=?"
+            + " and day<=DATE_ADD(?, INTERVAL 90 DAY) and day>?"
+            + " ;";
+
+        return dateQuery(conn, query, 1, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery6_5(Connection conn, String ticker, String date) {
+        String query =
+            "SELECT SUM(up) as upDays, SUM(down) as downDays, SUM(up)/SUM(down) as UPRATIO"
+            + " FROM (SELECT day, IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down"
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=? and day<=DATE_ADD(?, INTERVAL 90 DAY) and day>?"
+            + " GROUP BY day) a"
+            + " ;";
+
+        return dateQuery(conn, query, 3, ticker, date);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery7(Connection conn, String ticker) {
+        String query =
+            "SELECT * FROM"
+            + " (SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc, vol"
+            + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
+            + " FROM AdjustedPrices P"
+            + " WHERE Ticker=? and YEAR(day)=2016"
+            + " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
+            + " WHERE P1.Day = Y.Min"
+            + " AND P2.Day = Y.Max"
+            + " AND P1.Ticker=? and P2.Ticker=?) a"
+            + " JOIN "
+            + " (SELECT ticker, month, inc2016, vol FROM "
+            + " (SELECT Y.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc, vol"
+            + " FROM (SELECT ticker, MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
+            + " FROM AdjustedPrices P"
+            + " WHERE YEAR(day)=2016"
+            + " GROUP BY ticker, month) as Y, AdjustedPrices P1, AdjustedPrices P2"
+            + " WHERE P1.Day = Y.Min"
+            + " AND P2.Day = Y.Max"
+            + " AND P1.Ticker=P2.Ticker and P1.ticker=Y.ticker) a"
+            + " JOIN "
+            + " (SELECT P1.ticker "
+            + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " WHERE  YEAR(day)=2016"
+            + " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
+            + " WHERE P1.Day = Y.Min"
+            + " AND P2.Day = Y.Max AND P1.Ticker=P2.Ticker"
+            + " ORDER BY (P2.close-P1.open)/P1.open"
+            + " LIMIT 5 ) b"
+            + " USING(ticker)"
+            + " GROUP BY ticker, month) b"
+            + " USING (month) "
+            + " ;";
+
+        return tickerQuery(conn, query, 5, ticker, 3);
+    }
+
+    public static ArrayList<ArrayList<String>> IndivQuery8(Connection conn, String ticker) {
+        String query =
+            "SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc, vol"
+            + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
+            + " FROM AdjustedPrices P"
+            + " WHERE Ticker=? and YEAR(day)=2016"
+            + " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
+            + " WHERE P1.Day = Y.Min"
+            + " AND P2.Day = Y.Max"
+            + " AND P1.Ticker=? and P2.Ticker=?;";
+
+
+        return tickerQuery(conn, query, 5, ticker, 3);
+    }
+
 }
