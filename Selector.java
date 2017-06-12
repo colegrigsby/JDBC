@@ -489,7 +489,7 @@ public class Selector {
 
     public static ArrayList<ArrayList<String>> IndivQuery3_1(Connection conn, String ticker, String year) {
         String query =
-            "SELECT MONTH(Day) as m, AVG(close), MAX(High), MIN(Low), AVG(Volume)"
+            "SELECT MONTHNAME(Day) as m, AVG(close), MAX(High), MIN(Low), AVG(Volume)"
             + " FROM AdjustedPrices"
             + " WHERE Ticker=? and Year(day)="+year
             + " GROUP BY m;";
@@ -499,7 +499,7 @@ public class Selector {
 
     public static ArrayList<ArrayList<String>> IndivQuery3_2(Connection conn, String ticker) {
         String query =
-            "SELECT MONTH(Day) as m, AVG(volume)"
+            "SELECT MONTHNAME(Day) as m, AVG(volume)"
             + " FROM AdjustedPrices"
             + " WHERE Ticker=?"
             + " GROUP BY m;";
@@ -514,7 +514,7 @@ public class Selector {
             + " (SELECT year, month, STDC+STDV+UPRATIO as score "
             + " "
             + " FROM "
-            + " (SELECT YEAR(Day) as year, MONTH(Day) as month, "
+            + " (SELECT YEAR(Day) as year, MONTHNAME(Day) as month, "
             + " (SUM(Volume) - a.av) / a.st as STDV,  (AVG(Close) - b.av) / b.st as STDC"
             + " FROM AdjustedPrices, ("
             + " SELECT x1.y, STDDEV(v) as st, AVG(v) as av "
@@ -548,7 +548,7 @@ public class Selector {
             + " (SELECT STDC+STDV+UPRATIO as score "
             + " "
             + " FROM "
-            + " (SELECT YEAR(Day) as year, MONTH(Day) as month, "
+            + " (SELECT YEAR(Day) as year, MONTHNAME(Day) as month, "
             + " (SUM(Volume) - a.av) / a.st as STDV,  (AVG(Close) - b.av) / b.st as STDC"
             + " FROM AdjustedPrices, ("
             + " SELECT x1.y, STDDEV(v) as st, AVG(v) as av "
@@ -729,7 +729,7 @@ public class Selector {
         String query =
             "SELECT ticker, month, inc2016, inc, vol FROM"
             + " (SELECT Y.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
-            + " FROM (SELECT ticker, MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol "
+            + " FROM (SELECT ticker, MONTHNAME(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol "
             + " FROM AdjustedPrices P"
             + " WHERE YEAR(day)="+year
             + " GROUP BY ticker, month) as Y, AdjustedPrices P1, AdjustedPrices P2"
@@ -755,7 +755,7 @@ public class Selector {
     public static ArrayList<ArrayList<String>> IndivQuery8(Connection conn, String ticker) {
         String query =
             "SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
-            + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
+            + " FROM (SELECT MONTHNAME(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
             + " FROM AdjustedPrices P"
             + " WHERE Ticker=? and YEAR(day)=2016"
             + " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"

@@ -99,7 +99,7 @@ public class Report {
 			HashMap<String, ArrayList<ArrayList<String>>> relative){
 		List<String> head = Arrays.asList("Absolute Top Symbol", "Relative Top Symbol");
 
-		tags.add(div(h2("Top five stocks per year"), p("For each year with data, the following tables give "
+		tags.add(div(h1("Top five stocks per year"), p("For each year with data, the following tables give "
 				+ "the top 5 ticker symbols for the highest performing stocks based on their absolute and "
 				+ "relative price increases."),
 				each(years, y -> div( 
@@ -152,7 +152,6 @@ public class Report {
 	
 	public void byYearBestMonth(ArrayList<ArrayList<String>> data){
 
-		//TODO explanation of criteria
 		
 		tags.add(div(
 				p("To choose the best month of each year, a score was calculated based on "
