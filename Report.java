@@ -148,7 +148,7 @@ public class Report {
 				
 	}
 	
-	public void byYearBestMonth(List<String> years, ArrayList<String> data){
+	public void byYearBestMonth(ArrayList<ArrayList<String>> data){
 
 		//TODO explanation of criteria
 		
@@ -158,8 +158,7 @@ public class Report {
 						+ " price by month and the ratio of days in which the close was greater"
 						+ " than the open to the close being less than the open. The months with the "
 						+ " highest score in each year was chosen as the best performance month."),
-				each(years, y -> 
-					div(h2(y), p("TODO Best Month")))
+				top("Best Months per Year", Arrays.asList("Year", "Month"),data)
 				));
 	
 	}
@@ -183,19 +182,20 @@ public class Report {
 				));
 	}
 	
-	public void compareTop(String year, ArrayList<ArrayList<String>> data){
-		List<String> head = Arrays.asList("TODO"); 
+	public void compareTop(String year, ArrayList<ArrayList<String>> dataThis, ArrayList<ArrayList<String>> dataTop){
+		List<String> head = Arrays.asList("Year", "Month", "Ticker Symbol", "Increase", "Volume"); 
 		tags.add(div(
 				p("Top performing Stocks here are based upon the highest percentage"
 						+ " increase in value"),
-				top(year+ " data", head, data)
+				top(year + " " +ticker + " data", head, dataThis), 
+				top(year + " Top Performing Stock data", head, dataTop)
 				));
 	}
 	
-	public void compareNearby(String year, ArrayList<ArrayList<String>> data){
+	public void compareNearby(String year, String tick2, ArrayList<ArrayList<String>> data){
 		List<String> head = Arrays.asList("TODO"); 
 		tags.add(div(
-				p("Compare STOCK1 to STOCK2"),
+				p("Compare "+ticker+" to " + tick2),
 				top("Comparison month by month for " + year, head, data),
 				p("And the better performing stock is! : TODOAODS")
 				));

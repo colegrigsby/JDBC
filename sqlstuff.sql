@@ -391,4 +391,36 @@ SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, "Inc
         WHERE P1.Day = Y.Min
         AND P2.Day = Y.Max
         AND P1.Ticker='UAL' and P2.Ticker='UAL';
+        
+
+-- last full year of data 
+
+SELECT year 
+FROM (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max
+      FROM AdjustedPrices P
+      WHERE Ticker='FTV'
+      GROUP BY year) a
+WHERE MONTH(Min)=1 and MONTH(Max)=12
+ORDER BY year DESC
+LIMIT 1; 
+
+   
+
+-- get last full year that the two stocks were traded together 
+SELECT year
+FROM (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max
+FROM AdjustedPrices P
+WHERE Ticker='GOOG'
+GROUP BY year) a
+JOIN 
+(SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max
+FROM AdjustedPrices P
+WHERE Ticker='UAL'
+GROUP BY year) b
+USING (year, Min, Max) 
+WHERE MONTH(Min)=1 and MONTH(Max)=12
+ORDER BY year DESC
+LIMIT 1; 
+
+
 
