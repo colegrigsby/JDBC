@@ -95,14 +95,18 @@ public class Report {
 			    ));
 	}
 	
-	public void topFivePerYear(List<String> years, HashMap<String, ArrayList<ArrayList<String>>> tickers){
+	public void topFivePerYear(List<String> years, HashMap<String, ArrayList<ArrayList<String>>> absolute,
+			HashMap<String, ArrayList<ArrayList<String>>> relative){
 		List<String> head = Arrays.asList("Absolute Top Symbol", "Relative Top Symbol");
 
 		tags.add(div(h2("Top five stocks per year"), p("For each year with data, the following tables give "
 				+ "the top 5 ticker symbols for the highest performing stocks based on their absolute and "
 				+ "relative price increases."),
-				each(years, y -> 
-							top("Top Five for " + y, head, tickers.get(y))
+				each(years, y -> div( 
+								h2("Top Five for " + y),
+								top("Absolute", head, absolute.get(y)).withStyle("display: inline-block;"),
+								top("Relative", head, relative.get(y)).withStyle("display: inline-block;")
+							)
 						)
 				
 				));

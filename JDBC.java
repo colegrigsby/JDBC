@@ -96,13 +96,19 @@ public class JDBC {
 		
 		//3 
 		ArrayList<String> years = Selector.years(conn); 
-		HashMap<String, ArrayList<ArrayList<String>>> hm = new HashMap<>();
+		HashMap<String, ArrayList<ArrayList<String>>> abs = new HashMap<>();
 		
 		for (String y: years){
-			hm.put(y, Selector.GenQuery3_2(conn, y));
+			abs.put(y, Selector.GenQuery3_2(conn, y));
 		}
 		
-		r.topFivePerYear(years, hm);
+		HashMap<String, ArrayList<ArrayList<String>>> rel = new HashMap<>();
+		
+		for (String y: years){
+			rel.put(y, Selector.GenQuery3_3(conn, y));
+		}
+		
+		r.topFivePerYear(years, abs, rel);
 		
 		// 4
 		head = Arrays.asList("Ticker", "Name");
