@@ -104,7 +104,7 @@ public class JDBC {
 		// 1 
 		ArrayList<ArrayList<String>> a = Selector.IndivQuery1(conn, ticker);
 		String start = a.get(0).get(0);
-		String end = a.get(1).get(0);
+		String end = a.get(0).get(1);
 		r.dateInfo(start, end);
 		
 		// 2
