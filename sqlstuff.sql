@@ -112,21 +112,25 @@ WHERE P1.Day = Y.Min
 SELECT MIN(day), MAX(day) FROM Prices WHERE ticker='GOOG';
 
 -- Q2 
-SELECT YEAR(Day) as year, SUM(volume), AVG(close), AVG(volume) 
-FROM AdjustedPrices 
-WHERE Ticker='GOOG' 
-
-GROUP BY year ;
 
 
-SELECT Y.year, P2.close-P1.open as inc2016, IF(P2.close>P1.close, "Inc", "dec") as inc
+SELECT year, increase, v, c, a 
+FROM 
+(SELECT Y.year, P2.close-P1.open as increase, IF(P2.close>P1.close, "Inc", "dec") as inc
 FROM (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max
     FROM AdjustedPrices P
     WHERE Ticker='GOOG'
     GROUP BY year) as Y, AdjustedPrices P1, AdjustedPrices P2
 	WHERE P1.Day = Y.Min
     AND P2.Day = Y.Max
-	AND P1.Ticker='GOOG' and P2.Ticker='GOOG'
+	AND P1.Ticker='GOOG' and P2.Ticker='GOOG') a
+JOIN 
+    (SELECT YEAR(Day) as year, SUM(volume) as v, AVG(close) as c, AVG(volume) as a
+    FROM AdjustedPrices 
+    WHERE Ticker='GOOG' 
+
+    GROUP BY year ) b
+USING (year);
   
     
     

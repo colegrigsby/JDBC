@@ -124,12 +124,12 @@ public class Report {
 	}
 	
 	public void byYearInfo(ArrayList<ArrayList<String>> data){
-		List<String> head = Arrays.asList("Increase/Decrease from Previous Year", 
+		List<String> head = Arrays.asList("Year", "Increase/Decrease from Previous Year", 
 				"Volume of Trading", "Average Closing Price", "Average Trade Volume per Day");
 
 		
 		tags.add(div(
-				top("", head, data)
+				top("Yearly Data", head, data)
 				));
 	
 
@@ -208,6 +208,7 @@ public class Report {
 				p("And the better performing stock is! : TODOAODS")
 				));
 	}
+
 	
 
 }

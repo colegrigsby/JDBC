@@ -209,6 +209,29 @@ public class Selector {
         return execQuery(conn, query, 2);
     }
 
+    
+    public static List<String> years(Connection conn){
+    	String query = "SELECT YEAR(day) as year FROM AdjustedPrices GROUP BY year;";
+    	List<String> y = Arrays.asList();
+    	Statement s;
+		try {
+			s = conn.createStatement();
+	    	ResultSet r = s.executeQuery(query);
+	    	
+	        boolean check = r.next();
+			while (check) {
+					y.add(r.getString(1));
+	                check = r.next();
+	            }
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    	return y; 
+    }
     public static ArrayList<ArrayList<String>> GenQuery3_1(Connection conn) {
         String query =
             "SELECT Y.Year, Y.Ticker, S.Name"
@@ -237,13 +260,14 @@ public class Selector {
         return execQuery(conn, query, 3);
     }
 
-    public static ArrayList<ArrayList<String>> GenQuery3_2(Connection conn) {
+    public static ArrayList<ArrayList<String>> GenQuery3_2(Connection conn, String year) {
         String query =
             "SELECT Y.Year, Y.Ticker, S.Name"
             + " FROM (SELECT Ticker, YEAR(Day) AS Year, MIN(Day) AS Min, MAX(Day) AS Max"
             + " FROM AdjustedPrices P"
             + " GROUP BY Ticker, YEAR(Day)) Y, AdjustedPrices P1, AdjustedPrices P2, Securities S"
-            + " WHERE P1.Day = Y.Min"
+            + " WHERE Y.Year=" + year
+            + "	P1.Day = Y.Min"
             + " AND P2.Day = Y.Max"
             + " AND P1.Ticker = Y.Ticker"
             + " AND P2.Ticker = Y.Ticker"
@@ -267,7 +291,8 @@ public class Selector {
 
     public static ArrayList<ArrayList<String>> GenQuery4(Connection conn) {
         String query = 
-            "SELECT ticker, .5*UPRATIO + .1*STDVOLUME + 1.5*INC2016 as score"
+            "SELECT ticker, name FROM "
+            + " (SELECT ticker, name, .5*UPRATIO + .1*STDVOLUME + 1.5*INC2016 as score"
             + " FROM "
             + " ((SELECT ticker, IF((b.r IS NULL ), a.r-1, a.r-b.r) as UPRATIO FROM "
             + " (SELECT ticker, SUM(up), SUM(down), SUM(up)/SUM(down) as r"
@@ -315,9 +340,9 @@ public class Selector {
             + " AND P1.Ticker = Y.Ticker"
             + " AND P2.Ticker = Y.Ticker "
             + " ) "
-            + " inc USING (ticker)"
+            + " inc USING (ticker) JOIN Securities Using (ticker)"
             + " ORDER BY score DESC"
-            + " LIMIT 10"
+            + " LIMIT 10) a"
             + " ;";
 
         return execQuery(conn, query, 2);
@@ -385,6 +410,30 @@ public class Selector {
         return tickerQuery(conn, query, 2, ticker, 1);
     }
 
+    public static ArrayList<ArrayList<String>> IndivQuery2(Connection conn, String ticker){
+    	String query = 
+    			"SELECT year, increase, v, c, a "
+    			+ " FROM "
+    			+ " (SELECT Y.year, P2.close-P1.open as increase, IF(P2.close>P1.close, 'Inc', 'Dec') as inc"
+				+ " FROM (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max"
+				+ " FROM AdjustedPrices P"
+				+ " WHERE Ticker=?"
+				+ " GROUP BY year) as Y, AdjustedPrices P1, AdjustedPrices P2"
+				+ " WHERE P1.Day = Y.Min"
+				+ " AND P2.Day = Y.Max"
+				+ " AND P1.Ticker='GOOG' and P2.Ticker='GOOG') a"
+				+ " JOIN "
+				+ " (SELECT YEAR(Day) as year, SUM(volume) as v, AVG(close) as c, AVG(volume) as a"
+				+ " FROM AdjustedPrices"
+				+ "	WHERE Ticker=? "
+				+ " GROUP BY year ) b "
+				+ " USING (year);"; 
+    	
+        return tickerQuery(conn, query, 5, ticker, 4);
+
+    	
+    }
+    
     public static ArrayList<ArrayList<String>> IndivQuery2_1(Connection conn, String ticker) {
         String query =
             "SELECT YEAR(Day) as year, SUM(volume), AVG(close), AVG(volume)"
@@ -397,7 +446,7 @@ public class Selector {
 
     public static ArrayList<ArrayList<String>> IndivQuery2_2(Connection conn, String ticker) {
         String query =
-            "SELECT Y.year, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc"
+            "SELECT Y.year, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc"
             + " FROM (SELECT YEAR(day) as year, MIN(Day) AS Min, MAX(Day) AS Max"
             + " FROM AdjustedPrices P"
             + " WHERE Ticker=?"

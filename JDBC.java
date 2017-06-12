@@ -95,10 +95,17 @@ public class JDBC {
 		r.topTable("Most Heavily Traded 2016 Stocks", head, Selector.GenQuery2(conn));
 		
 		//3 
-		//TODO r.topFivePerYear(Selector.GenQuery3(conn));
+		List<String> years = Selector.years(conn); 
+		HashMap<String, ArrayList<ArrayList<String>>> hm = new HashMap<>();
+		
+		for (String y: years){
+			hm.put(y, Selector.GenQuery3_2(conn, y));
+		}
+		
+		r.topFivePerYear(years, hm);
 		
 		// 4
-		head = Arrays.asList("Ticker", "NAME TOFIX");
+		head = Arrays.asList("Ticker", "Name");
 		r.topTable("Top Ten Stocks to Watch in 2017", head, Selector.GenQuery4(conn));
 		
 		// 5 
@@ -114,7 +121,7 @@ public class JDBC {
 		
 		// 2
 
-		r.byYearInfo(Selector.IndivQuery2_1(conn, ticker));
+		r.byYearInfo(Selector.IndivQuery2(conn, ticker));
 		
 		//3 
 		r.lastYearInfo(fullYear, Selector.IndivQuery3_1(conn, ticker, fullYear));

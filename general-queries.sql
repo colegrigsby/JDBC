@@ -86,6 +86,30 @@ WHERE P1.Day = Y.Min
                 AND (P2.Close - P1.Open) <= (P4.Close - P3.Open))
 ORDER BY Y.Year, Y.Ticker;
 
+SELECT Y.Ticker, S.Name
+FROM (SELECT Ticker, YEAR(Day) AS Year, MIN(Day) AS Min, MAX(Day) AS Max
+    FROM Prices P
+    GROUP BY Ticker, YEAR(Day)) as Y, AdjustedPrices P1, AdjustedPrices P2, Securities S
+WHERE Y.Year=2016
+    AND P1.Day = Y.Min
+    AND P2.Day = Y.Max
+    AND P1.Ticker = Y.Ticker
+    AND P2.Ticker = Y.Ticker
+    AND S.Ticker = Y.Ticker
+    AND 5 >= 
+        (SELECT COUNT(*)
+            FROM (SELECT Ticker, YEAR(Day) AS Year,
+                        MIN(Day) AS Min, MAX(Day) AS Max
+                    FROM Prices P
+                    GROUP BY Ticker, YEAR(Day)) as Y1, Prices P3, Prices P4
+            WHERE P3.Day = Y1.Min
+                AND P4.Day = Y1.Max
+                AND P3.Ticker = Y1.Ticker
+                AND P4.Ticker = Y1.Ticker
+                AND Y1.Year = Y.Year
+                AND (P2.Close - P1.Open) <= (P4.Close - P3.Open))
+ORDER BY Y.Year, Y.Ticker;
+
 -- Q4
 
 -- Q5.1
