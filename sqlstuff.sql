@@ -5,7 +5,9 @@
 
 -- up ratio 
 
-SELECT ticker, .5*UPRATIO + .1*STDVOLUME + 1.5*INC2016 as score
+
+SELECT Ticker, Name FROM 
+(SELECT ticker, name, .5*UPRATIO + .1*STDVOLUME + 1.5*INC2016 as score
 
 FROM 
     ((SELECT ticker, IF((b.r IS NULL ), a.r-1, a.r-b.r) as UPRATIO FROM 
@@ -63,9 +65,10 @@ JOIN
         ) 
 
     inc USING (ticker)
-
+JOIN 
+    Securities USING(ticker) 
 ORDER BY score DESC
-LIMIT 10
+LIMIT 10) a
 ;
 
 
@@ -162,7 +165,7 @@ GROUP BY m;
 
 -- use values and determine 
 
-SELECT year, month
+SELECT year, MONTHNAME(STR_TO_DATE(month, '%m')), month
 FROM
     (SELECT year, month, STDC+STDV+UPRATIO as score 
 
