@@ -750,14 +750,14 @@ public class Selector {
             + "	LIMIT 5 ) b"
             + "	USING(ticker)"
             + "	GROUP BY ticker, month"
-            + " ORDER BY month;";
+            + " ORDER BY ticker, month;";
 
         return tickerQuery(conn, query, 5, ticker, 0);
     }
 
     public static ArrayList<ArrayList<String>> IndivQuery8(Connection conn, String ticker) {
         String query =
-            "SELECT P1.ticker, MONTHNAME(STR_TO_DATE(month, '%m')), P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
+            "SELECT MONTHNAME(STR_TO_DATE(month, '%m')), P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
             + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
             + " FROM AdjustedPrices P"
             + " WHERE Ticker=? and YEAR(day)=2016"
@@ -768,7 +768,7 @@ public class Selector {
             + " ORDER BY month;";
 
 
-        return tickerQuery(conn, query, 5, ticker, 3);
+        return tickerQuery(conn, query, 4, ticker, 3);
     }
 
 }

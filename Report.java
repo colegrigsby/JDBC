@@ -193,21 +193,21 @@ public class Report {
 	}
 	
 	public void compareTop(String year, ArrayList<ArrayList<String>> dataThis, ArrayList<ArrayList<String>> dataTop){
-		List<String> head = Arrays.asList("Year", "Month", "Ticker Symbol", "Increase", "Volume"); 
+		List<String> head = Arrays.asList("Ticker", "Month", "Increase/Decrease", "", "Volume"); 
 		tags.add(div(
 				p("Top performing Stocks here are based upon the highest percentage"
 						+ " increase in value"),
-				top(year + " " +ticker + " data", head, dataThis), 
-				top(year + " Top Performing Stock data", head, dataTop)
+				top(year + " " +ticker + " data", head, dataThis).withStyle("display: inline-block;"), 
+				top(year + " Top Performing Stock data", head, dataTop).withStyle("display: inline-block;")
 				));
 	}
 	
 	public void compareNearby(String year, String tick2, ArrayList<ArrayList<String>> data1,ArrayList<ArrayList<String>> data2){
-		List<String> head = Arrays.asList("TODO"); 
+		List<String> head = Arrays.asList("Month", "Increase/Decrease Over the Year","", "Volume of Trading"); 
 		tags.add(div(
 				p("Compare "+ticker+" to " + tick2),
-				top("month by month for " + year + ": " + ticker, head, data1),
-				top("month by month for " + year + ": " + tick2, head, data2),
+				top("month by month for " + year + ": " + ticker, head, data1).withStyle("display: inline-block;"),
+				top("month by month for " + year + ": " + tick2, head, data2).withStyle("display: inline-block;"),
 				p("And the better performing stock is! : TODOAODS")
 				));
 	}
