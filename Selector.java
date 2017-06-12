@@ -262,12 +262,12 @@ public class Selector {
 
     public static ArrayList<ArrayList<String>> GenQuery3_2(Connection conn, String year) {
         String query =
-            "SELECT Y.Year, Y.Ticker, S.Name"
+            "SELECT Y.Ticker, S.Name"
             + " FROM (SELECT Ticker, YEAR(Day) AS Year, MIN(Day) AS Min, MAX(Day) AS Max"
             + " FROM AdjustedPrices P"
             + " GROUP BY Ticker, YEAR(Day)) Y, AdjustedPrices P1, AdjustedPrices P2, Securities S"
             + " WHERE Y.Year=" + year
-            + "	P1.Day = Y.Min"
+            + "	AND P1.Day = Y.Min"
             + " AND P2.Day = Y.Max"
             + " AND P1.Ticker = Y.Ticker"
             + " AND P2.Ticker = Y.Ticker"
@@ -286,7 +286,7 @@ public class Selector {
             + " AND (P2.Close - P1.Open) <= (P4.Close - P3.Open))"
             + " ORDER BY Y.Year, Y.Ticker;";
 
-        return execQuery(conn, query, 3);
+        return execQuery(conn, query, 2);
     }
 
     public static ArrayList<ArrayList<String>> GenQuery4(Connection conn) {
@@ -421,7 +421,7 @@ public class Selector {
 				+ " GROUP BY year) as Y, AdjustedPrices P1, AdjustedPrices P2"
 				+ " WHERE P1.Day = Y.Min"
 				+ " AND P2.Day = Y.Max"
-				+ " AND P1.Ticker='GOOG' and P2.Ticker='GOOG') a"
+				+ " AND P1.Ticker=? and P2.Ticker=?) a"
 				+ " JOIN "
 				+ " (SELECT YEAR(Day) as year, SUM(volume) as v, AVG(close) as c, AVG(volume) as a"
 				+ " FROM AdjustedPrices"
