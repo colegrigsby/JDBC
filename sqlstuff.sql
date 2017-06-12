@@ -142,6 +142,11 @@ FROM AdjustedPrices
 WHERE Ticker='GOOG' and Year(day)=2016 
 ; 
 
+SELECT MONTH(Day) as m, AVG(close), MAX(High), MIN(Low), AVG(Volume)
+FROM AdjustedPrices
+WHERE Ticker='GOOG' and Year(day)=2016
+GROUP BY m;
+
 
 SELECT MONTH(Day) as m, AVG(volume) 
 FROM AdjustedPrices 
@@ -343,7 +348,7 @@ SELECT * FROM
         WHERE P1.Day = Y.Min
         AND P2.Day = Y.Max
         AND P1.Ticker='GOOG' and P2.Ticker='GOOG') a
-JOIN 
+	JOIN 
     (SELECT ticker, month, inc2016, vol FROM 
         (SELECT Y.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, "Inc", "dec") as inc, vol
             FROM (SELECT ticker, MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol

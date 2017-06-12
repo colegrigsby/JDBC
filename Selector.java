@@ -409,14 +409,14 @@ public class Selector {
         return tickerQuery(conn, query, 3, ticker, 3);
     }
 
-    public static ArrayList<ArrayList<String>> IndivQuery3_1(Connection conn, String ticker) {
+    public static ArrayList<ArrayList<String>> IndivQuery3_1(Connection conn, String ticker, String year) {
         String query =
-            "SELECT AVG(close), IF(MIN(close)<MIN(open), MIN(close), MIN(open)),"
-            + " IF(MAX(open)>MAX(close), MAX(open), MAX(close))"
+            "SELECT MONTH(Day) as m, AVG(close), MAX(High), MIN(Low), AVG(Volume)"
             + " FROM AdjustedPrices"
-            + " WHERE Ticker=? and Year(day)=2016;";
+            + " WHERE Ticker=? and Year(day)="+year
+            + " GROUP BY m;";
 
-        return tickerQuery(conn, query, 3, ticker, 1);
+        return tickerQuery(conn, query, 5, ticker, 1);
     }
 
     public static ArrayList<ArrayList<String>> IndivQuery3_2(Connection conn, String ticker) {
@@ -632,42 +632,44 @@ public class Selector {
 
         return dateQuery(conn, query, 3, ticker, date);
     }
-
-    public static ArrayList<ArrayList<String>> IndivQuery7(Connection conn, String ticker) {
+    public static ArrayList<ArrayList<String>> IndivQuery7_1(Connection conn, String ticker, String year) {
         String query =
-            "SELECT * FROM"
-            + " (SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc, vol"
-            + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
-            + " FROM AdjustedPrices P"
-            + " WHERE Ticker=? and YEAR(day)=2016"
-            + " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
-            + " WHERE P1.Day = Y.Min"
-            + " AND P2.Day = Y.Max"
-            + " AND P1.Ticker=? and P2.Ticker=?) a"
-            + " JOIN "
-            + " (SELECT ticker, month, inc2016, vol FROM "
+        		"SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
+    		+ " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
+    		+ " FROM AdjustedPrices P"
+    		+ " WHERE Ticker='GOOG' and YEAR(day)="+year
+    		+ " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
+    		+ " WHERE P1.Day = Y.Min"
+    		+ " AND P2.Day = Y.Max"
+    		+ " AND P1.Ticker='GOOG' and P2.Ticker='GOOG'";
+        
+        return tickerQuery(conn, query, 5, ticker, 3);
+    }
+
+
+    public static ArrayList<ArrayList<String>> IndivQuery7_2(Connection conn, String ticker, String year) {
+        String query =
+            "SELECT ticker, month, inc2016, inc, vol FROM"
             + " (SELECT Y.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc, vol"
-            + " FROM (SELECT ticker, MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
+            + " FROM (SELECT ticker, MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol "
             + " FROM AdjustedPrices P"
-            + " WHERE YEAR(day)=2016"
+            + " WHERE YEAR(day)="+year
             + " GROUP BY ticker, month) as Y, AdjustedPrices P1, AdjustedPrices P2"
             + " WHERE P1.Day = Y.Min"
             + " AND P2.Day = Y.Max"
             + " AND P1.Ticker=P2.Ticker and P1.ticker=Y.ticker) a"
             + " JOIN "
             + " (SELECT P1.ticker "
-            + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max "
             + " FROM AdjustedPrices P"
-            + " WHERE  YEAR(day)=2016"
-            + " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
-            + " WHERE P1.Day = Y.Min"
-            + " AND P2.Day = Y.Max AND P1.Ticker=P2.Ticker"
-            + " ORDER BY (P2.close-P1.open)/P1.open"
-            + " LIMIT 5 ) b"
-            + " USING(ticker)"
-            + " GROUP BY ticker, month) b"
-            + " USING (month) "
-            + " ;";
+            + "	WHERE  YEAR(day)="+year
+            + "	GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
+            + "	WHERE P1.Day = Y.Min"
+            + "	AND P2.Day = Y.Max AND P1.Ticker=P2.Ticker"
+            + "	ORDER BY (P2.close-P1.open)/P1.open"
+            + "	LIMIT 5 ) b"
+            + "	USING(ticker)"
+            + "	GROUP BY ticker, month;";
 
         return tickerQuery(conn, query, 5, ticker, 3);
     }

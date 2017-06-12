@@ -81,6 +81,8 @@ public class JDBC {
 	public static void runAndWrite(Connection conn, String ticker){
 		Report r = new Report(ticker);
 		
+		String fullYear = Selector.getFullYear(conn, ticker);
+		
 		//1 
 		r.info(Selector.GenQuery1_1(conn), Selector.GenQuery1_2(conn),
 				Selector.GenQuery1_3(conn), Selector.GenQuery1_4(conn));
@@ -100,31 +102,46 @@ public class JDBC {
 		
 		
 		// 1 
-		//TODO r.dateInfo(start, end);
+		ArrayList<ArrayList<String>> a = Selector.IndivQuery1(conn, ticker);
+		String start = a.get(0).get(0);
+		String end = a.get(1).get(0);
+		r.dateInfo(start, end);
 		
 		// 2
-		head = Arrays.asList("Year", "Increase", "Volume", "Average Closing", 
-				"Average Daily Trade Volume");
-		//r.top(name, head, labels)
+
+		r.byYearInfo(Selector.IndivQuery2_1(conn, ticker));
 		
 		//3 
-		//r.byYearInfo(years, data);
+		r.lastYearInfo(fullYear, Selector.IndivQuery3_1(conn, ticker, fullYear));
 		
 		//4 
-		//head = Arrays.asList("Year", "Month");
-		//r.byYearBestMonth(name, head, labels)
+		head = Arrays.asList("Year", "Month");
+		//TODO convert months to names 
+		r.byYearBestMonth(Selector.IndivQuery4(conn, ticker));
 		
 		//5 
-		//r.predictions(data);
+		List<String> dates = Arrays.asList("2015-01-01", "2015-06-01", "2015-10-01",
+				"2016-01-01","2015-05-01","2015-10-01");
+		for (String date: dates){
+			//TODO 
+			//r.predictions(Selector.IndivQuery5_1(conn, ticker, date));
+			
+		}
 		
 		// 6
 		//r.outcomes(data);
+		for (String date: dates){
+			//TODO 
+			//r.outcomes(Selector.IndivQuery6_1(conn, ticker, date));
+			
+		}
 		
 		//7
-		//r.compareTop(year, data);
+		r.compareTop(fullYear, Selector.IndivQuery7_1(conn, ticker, fullYear), Selector.IndivQuery7_2(conn, ticker, fullYear));
 		
 		// 8
-		//r.compareNearby(year, data);
+		String ticker2 = "UAL";
+		r.compareNearby(fullYear, ticker2, Selector.IndivQuery8(conn, ticker),Selector.IndivQuery8(conn, ticker2));
 		
 		r.writeFile();
 		

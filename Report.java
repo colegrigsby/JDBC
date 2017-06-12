@@ -123,15 +123,13 @@ public class Report {
 				));
 	}
 	
-	public void byYearInfo(List<String> years, ArrayList<ArrayList<String>> data){
+	public void byYearInfo(ArrayList<ArrayList<String>> data){
 		List<String> head = Arrays.asList("Increase/Decrease from Previous Year", 
 				"Volume of Trading", "Average Closing Price", "Average Trade Volume per Day");
 
 		
 		tags.add(div(
-				each(years, y -> 
-				top(y, head, data)
-						)
+				top("", head, data)
 				));
 	
 
@@ -139,7 +137,7 @@ public class Report {
 	
 	public void lastYearInfo(String y, ArrayList<ArrayList<String>> data){
 		List<String> head = Arrays.asList(
-				"Average Closing Price", "Highest Price", "Lowest Price",
+				"Month", "Average Closing Price", "Highest Price", "Lowest Price",
 				"Average Trade Volume per Month");
 
 		tags.add(div(h3("Info for " + y),
@@ -163,13 +161,22 @@ public class Report {
 	
 	}
 	
-	public void predictions(ArrayList<ArrayList<String>> data){
+	public void predictions(ArrayList<ArrayList<String>> data1, ArrayList<ArrayList<String>> data2, ArrayList<ArrayList<String>> data3,
+			ArrayList<ArrayList<String>> data4, ArrayList<ArrayList<String>> data5, ArrayList<ArrayList<String>> data6){
+		
+		
+		ArrayList<ArrayList<String>> pred = new ArrayList<>(); 
+		
+		
+		//TODO 
+		
+		
 		List<String> head = Arrays.asList("Date", "Position"); 
 		tags.add(div(
 				p("Predictions for each date are based on the relative"
 				+ " price of the stock, how volatile it is based on the days up versus down and the overall recent "
 				+ " increases/decreases over the previous two months"),
-				top("Predictions", head, data)
+				top("Predictions", head, pred)
 				));
 	}
 	
@@ -192,11 +199,12 @@ public class Report {
 				));
 	}
 	
-	public void compareNearby(String year, String tick2, ArrayList<ArrayList<String>> data){
+	public void compareNearby(String year, String tick2, ArrayList<ArrayList<String>> data1,ArrayList<ArrayList<String>> data2){
 		List<String> head = Arrays.asList("TODO"); 
 		tags.add(div(
 				p("Compare "+ticker+" to " + tick2),
-				top("Comparison month by month for " + year, head, data),
+				top("month by month for " + year + ": " + ticker, head, data1),
+				top("month by month for " + year + ": " + tick2, head, data2),
 				p("And the better performing stock is! : TODOAODS")
 				));
 	}
