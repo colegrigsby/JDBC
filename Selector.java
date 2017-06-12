@@ -210,9 +210,9 @@ public class Selector {
     }
 
     
-    public static List<String> years(Connection conn){
+    public static ArrayList<String> years(Connection conn){
     	String query = "SELECT YEAR(day) as year FROM AdjustedPrices GROUP BY year;";
-    	List<String> y = Arrays.asList();
+    	ArrayList<String> y = new ArrayList<>();
     	Statement s;
 		try {
 			s = conn.createStatement();

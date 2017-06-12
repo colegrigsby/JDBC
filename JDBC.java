@@ -95,7 +95,7 @@ public class JDBC {
 		r.topTable("Most Heavily Traded 2016 Stocks", head, Selector.GenQuery2(conn));
 		
 		//3 
-		List<String> years = Selector.years(conn); 
+		ArrayList<String> years = Selector.years(conn); 
 		HashMap<String, ArrayList<ArrayList<String>>> hm = new HashMap<>();
 		
 		for (String y: years){
