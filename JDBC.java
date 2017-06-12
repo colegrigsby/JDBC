@@ -11,6 +11,7 @@ import java.lang.*;
 public class JDBC {
 
 	private static Connection conn;
+	private static String tickName;
 	
 	public static void main(String args[]) {
 
@@ -26,8 +27,6 @@ public class JDBC {
 		
 		conn = openConnection();
 		
-		runAndWrite(conn, ticker);
-		
 		try {
 			Statement test = conn.createStatement();
 			String t=  "SELECT * FROM Securities WHERE ticker='"+ticker+"'";
@@ -35,14 +34,18 @@ public class JDBC {
 			boolean f = r.next();
 			while (f) {
 				String s = r.getString(1);
-				String a = r.getString(2);
-				System.out.println(s + ", " + a);
+				tickName = r.getString(2);
+				System.out.println(s + ", " + tickName);
 				f = r.next();
 			}
 			//System.out.println(topTable("2016 Top Traded", Arrays.asList("Ticker", "Name"), Selector.GenQuery2(conn)).render());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		runAndWrite(conn, ticker);
+		
+		
 	}
 	
 	private static Connection openConnection() {
@@ -101,7 +104,7 @@ public class JDBC {
 		// 5 
 		
 		
-		r.tickerInfo(ticker, "WHOASHDFASDF");
+		r.tickerInfo(ticker, tickName);
 		
 		// 1 
 		ArrayList<ArrayList<String>> a = Selector.IndivQuery1(conn, ticker);

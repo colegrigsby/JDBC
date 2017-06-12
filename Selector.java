@@ -650,7 +650,7 @@ public class Selector {
     public static ArrayList<ArrayList<String>> IndivQuery7_2(Connection conn, String ticker, String year) {
         String query =
             "SELECT ticker, month, inc2016, inc, vol FROM"
-            + " (SELECT Y.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc, vol"
+            + " (SELECT Y.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
             + " FROM (SELECT ticker, MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol "
             + " FROM AdjustedPrices P"
             + " WHERE YEAR(day)="+year
@@ -676,7 +676,7 @@ public class Selector {
 
     public static ArrayList<ArrayList<String>> IndivQuery8(Connection conn, String ticker) {
         String query =
-            "SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'dec') as inc, vol"
+            "SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
             + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
             + " FROM AdjustedPrices P"
             + " WHERE Ticker=? and YEAR(day)=2016"
