@@ -101,6 +101,8 @@ public class JDBC {
 		// 5 
 		
 		
+		r.tickerInfo(ticker, "WHOASHDFASDF");
+		
 		// 1 
 		ArrayList<ArrayList<String>> a = Selector.IndivQuery1(conn, ticker);
 		String start = a.get(0).get(0);

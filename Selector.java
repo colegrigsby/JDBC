@@ -504,7 +504,7 @@ public class Selector {
             + " ORDER BY year "
             + " ;";
 
-        return tickerQuery(conn, query, 2, ticker, 7);
+        return tickerQuery(conn, query, 2, ticker, 8);
     }
 
     public static ArrayList<ArrayList<String>> IndivQuery5_1(Connection conn, String ticker, String date) {
@@ -637,11 +637,11 @@ public class Selector {
         		"SELECT P1.ticker, month, P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
     		+ " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
     		+ " FROM AdjustedPrices P"
-    		+ " WHERE Ticker='GOOG' and YEAR(day)="+year
+    		+ " WHERE Ticker=? and YEAR(day)="+year
     		+ " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
     		+ " WHERE P1.Day = Y.Min"
     		+ " AND P2.Day = Y.Max"
-    		+ " AND P1.Ticker='GOOG' and P2.Ticker='GOOG'";
+    		+ " AND P1.Ticker=? and P2.Ticker=?";
         
         return tickerQuery(conn, query, 5, ticker, 3);
     }
@@ -671,7 +671,7 @@ public class Selector {
             + "	USING(ticker)"
             + "	GROUP BY ticker, month;";
 
-        return tickerQuery(conn, query, 5, ticker, 3);
+        return tickerQuery(conn, query, 5, ticker, 0);
     }
 
     public static ArrayList<ArrayList<String>> IndivQuery8(Connection conn, String ticker) {
