@@ -232,35 +232,8 @@ public class Selector {
     	
     	return y; 
     }
-    public static ArrayList<ArrayList<String>> GenQuery3_1(Connection conn) {
-        String query =
-            "SELECT Y.Year, Y.Ticker, S.Name"
-            + " FROM (SELECT Ticker, YEAR(Day) AS Year, MIN(Day) AS Min, MAX(Day) AS Max"
-            + " FROM Prices P"
-            + " GROUP BY Ticker, YEAR(Day)) Y, Prices P1, Prices P2, Securities S"
-            + " WHERE P1.Day = Y.Min"
-            + " AND P2.Day = Y.Max"
-            + " AND P1.Ticker = Y.Ticker"
-            + " AND P2.Ticker = Y.Ticker"
-            + " AND S.Ticker = Y.Ticker"
-            + " AND 5 >="
-            + " (SELECT COUNT(*)"
-            + " FROM (SELECT Ticker, YEAR(Day) AS Year,"
-            + " MIN(Day) AS Min, MAX(Day) AS Max"
-            + " FROM Prices P"
-            + " GROUP BY Ticker, YEAR(Day)) as Y1, Prices P3, Prices P4"
-            + " WHERE P3.Day = Y1.Min"
-            + " AND P4.Day = Y1.Max"
-            + " AND P3.Ticker = Y1.Ticker"
-            + " AND P4.Ticker = Y1.Ticker"
-            + " AND Y1.Year = Y.Year"
-            + " AND (P2.Close - P1.Open) <= (P4.Close - P3.Open))"
-            + " ORDER BY Y.Year, Y.Ticker;";
 
-        return execQuery(conn, query, 3);
-    }
-
-    public static ArrayList<ArrayList<String>> GenQuery3_2(Connection conn, String year) {
+    public static ArrayList<ArrayList<String>> GenQuery3_1(Connection conn, String year) {
         String query =
             "SELECT Y.Ticker, S.Name"
             + " FROM (SELECT Ticker, YEAR(Day) AS Year, MIN(Day) AS Min, MAX(Day) AS Max"
@@ -284,6 +257,35 @@ public class Selector {
             + " AND P4.Ticker = Y1.Ticker"
             + " AND Y1.Year = Y.Year"
             + " AND (P2.Close - P1.Open) <= (P4.Close - P3.Open))"
+            + " ORDER BY Y.Year, Y.Ticker;";
+
+        return execQuery(conn, query, 2);
+    }
+    
+    public static ArrayList<ArrayList<String>> GenQuery3_2(Connection conn, String year) {
+        String query =
+            "SELECT Y.Ticker, S.Name"
+            + " FROM (SELECT Ticker, YEAR(Day) AS Year, MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " GROUP BY Ticker, YEAR(Day)) Y, AdjustedPrices P1, AdjustedPrices P2, Securities S"
+            + " WHERE Y.Year=" + year
+            + "	AND P1.Day = Y.Min"
+            + " AND P2.Day = Y.Max"
+            + " AND P1.Ticker = Y.Ticker"
+            + " AND P2.Ticker = Y.Ticker"
+            + " AND S.Ticker = Y.Ticker"
+            + " AND 5 >="
+            + " (SELECT COUNT(*)"
+            + " FROM (SELECT Ticker, YEAR(Day) AS Year,"
+            + " MIN(Day) AS Min, MAX(Day) AS Max"
+            + " FROM AdjustedPrices P"
+            + " GROUP BY Ticker, YEAR(Day)) as Y1, AdjustedPrices P3, AdjustedPrices P4"
+            + " WHERE P3.Day = Y1.Min"
+            + " AND P4.Day = Y1.Max"
+            + " AND P3.Ticker = Y1.Ticker"
+            + " AND P4.Ticker = Y1.Ticker"
+            + " AND Y1.Year = Y.Year"
+            + " AND (P2.Close - P1.Open) / P1.Open <= (P4.Close - P3.Open) / P3.Open)"
             + " ORDER BY Y.Year, Y.Ticker;";
 
         return execQuery(conn, query, 2);
