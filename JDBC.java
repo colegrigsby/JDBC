@@ -99,13 +99,13 @@ public class JDBC {
 		HashMap<String, ArrayList<ArrayList<String>>> abs = new HashMap<>();
 		
 		for (String y: years){
-			abs.put(y, Selector.GenQuery3_2(conn, y));
+			abs.put(y, Selector.GenQuery3_1(conn, y));
 		}
 		
 		HashMap<String, ArrayList<ArrayList<String>>> rel = new HashMap<>();
 		
 		for (String y: years){
-			rel.put(y, Selector.GenQuery3_3(conn, y));
+			rel.put(y, Selector.GenQuery3_2(conn, y));
 		}
 		
 		r.topFivePerYear(years, abs, rel);
