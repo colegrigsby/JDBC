@@ -132,18 +132,18 @@ public class Selector {
 
     public static String GenQuery1_1(Connection conn) {
         String query = 
-            "SELECT COUNT(*)"
-            + " FROM Securities"
-            + " WHERE YEAR(StartDate) < 2016;";
+            "SELECT COUNT(DISTINCT Ticker)"
+            + " FROM Prices"
+            + " WHERE YEAR(Day) < 2016;";
 
         return execQuery(conn, query, 1).get(0).get(0);
     }
 
     public static String GenQuery1_2(Connection conn) {
         String query =
-            "SELECT COUNT(*)"
-            + " FROM Securities"
-            + " WHERE YEAR(StartDate) < 2017;";
+            "SELECT COUNT(DISTINCT Ticker)"
+            + " FROM Prices"
+            + " WHERE YEAR(Day) < 2017;";
 
         return execQuery(conn, query, 1).get(0).get(0);
     }
@@ -352,7 +352,7 @@ public class Selector {
 
     public static ArrayList<ArrayList<String>> GenQuery5_1(Connection conn) {
         String query =
-            "SELECT Sector, SUM(up), SUM(down), SUM(up)/SUM(down)"
+            "SELECT Sector, SUM(up)/SUM(down)"
             + " FROM (SELECT Sector,"
             + " IF(Close > Open, 1, 0) as Up, IF(Close > Open, 0, 1) as Down"
             + " FROM AdjustedPrices AP, Securities S"
@@ -360,15 +360,16 @@ public class Selector {
             + " AND YEAR(Day) = 2016"
             + " AND Sector != 'Telecommunications Services') X"
             + " GROUP BY Sector"
+            + " ORDER BY Sector"
             + " ;";
 
 
-        return execQuery(conn, query, 4);
+        return execQuery(conn, query, 2);
     }
 
     public static ArrayList<ArrayList<String>> GenQuery5_2(Connection conn) {
         String query =
-            "SELECT Sector, SUM(AP2.Close) - SUM(AP1.Open)"
+            "SELECT Sector, (SUM(AP2.Close) - SUM(AP1.Open)) / SUM(AP1.Open)"
             + " FROM Securities S,"
             + " (SELECT Ticker, Open"
             + " FROM AdjustedPrices A"
@@ -383,6 +384,7 @@ public class Selector {
             + " WHERE AP1.Ticker = AP2.Ticker"
             + " AND S.Ticker = AP1.Ticker"
             + " GROUP BY Sector"
+            + " ORDER BY Sector"
             + " ;";
 
         return execQuery(conn, query, 2);
@@ -390,7 +392,7 @@ public class Selector {
 
     public static ArrayList<ArrayList<String>> GenQuery5_3(Connection conn) {
         String query =
-            "SELECT Sector, SUM(Volume), (SUM(Volume) - A.Avg) / A.StDev as Stv"
+            "SELECT Sector, (SUM(Volume) - A.Avg) / A.StDev as Stv"
             + " FROM (SELECT STDDEV(V) as StDev, AVG(V) as Avg"
             + " FROM (SELECT SUM(Volume) as V"
             + " FROM AdjustedPrices AP, Securities S"
@@ -401,10 +403,32 @@ public class Selector {
             + " WHERE YEAR(Day) = 2016"
             + " AND AP.Ticker = S.Ticker"
             + " GROUP BY Sector"
+            + " ORDER BY Sector"
             + " ;";
 
-        return execQuery(conn, query, 3);
+        return execQuery(conn, query, 2);
     }
+
+    public static ArrayList<String> sectors(Connection conn){
+        String query = "SELECT DISTINCT Sector FROM Securities;";
+        ArrayList<String> y = new ArrayList<>();
+        Statement s;
+                try {
+                        s = conn.createStatement();
+                ResultSet r = s.executeQuery(query);
+
+                boolean check = r.next();
+                        while (check) {
+                                        y.add(r.getString(1));
+                        check = r.next();
+                    }
+
+                } catch (SQLException e) {
+                        e.printStackTrace();
+                }
+        return y;
+    }
+
 
     public static ArrayList<ArrayList<String>> IndivQuery1(Connection conn, String ticker) {
         String query =

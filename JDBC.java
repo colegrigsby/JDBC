@@ -115,8 +115,40 @@ public class JDBC {
 		r.topTable("Top Ten Stocks to Watch in 2017", head, Selector.GenQuery4(conn));
 		
 		// 5 
-		
-		
+                ArrayList<ArrayList<String>> assesments = new ArrayList<ArrayList<String>>();
+
+                ArrayList<ArrayList<String>> ratios = Selector.GenQuery5_1(conn);
+                ArrayList<ArrayList<String>> increases = Selector.GenQuery5_2(conn);
+                ArrayList<ArrayList<String>> volumes = Selector.GenQuery5_3(conn);
+
+                for (int i = 0; i < ratios.size(); i++) {
+                    float upRat = Float.parseFloat(ratios.get(i).get(1));
+                    float percInc = Float.parseFloat(increases.get(i).get(1));
+                    float stdVol = Float.parseFloat(volumes.get(i).get(1));
+
+                    String str;
+
+                    if (percInc < 0 && stdVol < 0) str = "Declining";
+                    else if (percInc > 0.05 && stdVol < 0) str = "Increasing (Potential peak)";
+                    else if (percInc < -0.05 && stdVol > 0) str = "Declining (Potential trough)";
+                    else if (percInc > 0.05 && stdVol > 0) {
+                        if (upRat > 1.1) str = "Increasing (More steady market)";
+                        else str = "Increasing (More volatile market)";
+                    }
+                    else str = "Stagnant";
+
+                    ArrayList<String> assesment = new ArrayList<String>();
+                    assesment.add(ratios.get(i).get(0));
+                    //assesment.add(ratios.get(i).get(1));
+                    //assesment.add(increases.get(i).get(1));
+                    //assesment.add(volumes.get(i).get(1));
+                    assesment.add(str);
+
+                    assesments.add(assesment);
+                }
+
+                head = Arrays.asList("Sector", "Assesment");
+		r.topTable("Sector Assesments", head, assesments);
 		r.tickerInfo(ticker, tickName);
 		
 		// 1 
