@@ -48,7 +48,7 @@ public class Report {
 			fw = new FileWriter(f);
 			fw.write(
 					html(
-						head(title(ticker), link().withRel("stylesheet").withHref("css/main.css"))
+						head(title(ticker))
 							.with(h1("General Info!"))	
 						,body().with(tags)
 						).render());
@@ -90,12 +90,12 @@ public class Report {
 		
 		return div(h2(name),
 				table(
-					thead(each(head, h -> th(h))),
+					thead(each(head, h -> th(h).withStyle("border: 1px solid black;"))),
 						tbody(
 							each(labels, i -> tr( 
-								each(i, w -> td(w))
+								each(i, w -> td(w).withStyle("border: 1px solid black;"))
 			            ))
-			        )
+			        ).withStyle("border: 1px solid black; border-collapse: collapse;")
 			    ));
 	}
 	
