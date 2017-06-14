@@ -658,7 +658,7 @@ public class Selector {
     public static String IndivQuery6_1(Connection conn, String ticker, String date) {
         String query =
             "SELECT CASE "
-            + "	WHEN h3 > hq and upratio > 1.2 and dif3>0"
+            + "	WHEN h3 > h1 and upratio > 1.2 and dif3>0"
             + " THEN 'Buy' "
             + " WHEN dif3<0"
             + " THEN 'Sell'"
