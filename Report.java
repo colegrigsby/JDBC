@@ -173,7 +173,7 @@ public class Report {
 				+ " price of the stock, how volatile it is based on the days up versus down and the overall recent "
 				+ " increases/decreases over the previous two months").withStyle("display: inline-block;"), 
 				p("Outcomes are based upon the same criteria as above, but with an emphasis on "
-						+ "the increase in price.").withStyle("display: inline-block;"), 
+						+ "the increase in price."),
 				top("Predictions", head, pred).withStyle("display: inline-block;"), 
 				top("results", head, future).withStyle("display: inline-block;")
 				));

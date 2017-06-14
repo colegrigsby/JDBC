@@ -586,9 +586,9 @@ public class Selector {
     public static String IndivQuery5_1(Connection conn, String ticker, String date) {
         String query =
             "SELECT CASE "
-            + "	WHEN h1 < h2 and h3 > h1 and upratio > 1.2 and dif1 < dif2"
+            + "	WHEN h3 > h1 and upratio > 1.2 and dif1 < dif2"
             + " THEN 'Buy' "
-            + " WHEN h1 > h2 and h1 > h3 and upratio < 1.2 and dif1 > dif2 and dif3>0"
+            + " WHEN h1 > h3 and upratio < 1.2 and dif3>0"
             + " THEN 'Sell'"
             + " ELSE 'Hold' "
             + " END as Decision"
@@ -658,9 +658,9 @@ public class Selector {
     public static String IndivQuery6_1(Connection conn, String ticker, String date) {
         String query =
             "SELECT CASE "
-            + "	WHEN h1 < h2 and h3 > h2 and upratio > 1.2 and dif3 > dif1"
+            + "	WHEN h3 > hq and upratio > 1.2 and dif3>0"
             + " THEN 'Buy' "
-            + " WHEN h1 > h2 and h1 > h3 and upratio < 1.2 and dif3<0"
+            + " WHEN dif3<0"
             + " THEN 'Sell'"
             + " ELSE 'Hold' "
             + " END as Decision"
