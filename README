@@ -1,6 +1,9 @@
 Cole Grigsby, Robert Weber
 cegrigsb@calpoly.edu, roweber@calpoly.edu
 
+The opensource j2html library was used to generate html code
+https://j2html.com/
+
 Compiling the program:
 javac *.java j2html/*.java
 
