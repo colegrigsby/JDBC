@@ -1,0 +1,59 @@
+Cole Grigsby, Robert Weber
+cegrigsb@calpoly.edu, roweber@calpoly.edu
+
+Compiling the program:
+javac *.java j2html/*.java
+
+Running the program:
+java -cp ./mysql-connector-java-5.1.18-bin.jar:. JDBC <TickerName>
+
+Alternatively, the run script can be used to compile and run the program with all 4 tickers
+
+The credential file is located in the same directory as the executable
+
+
+Stock evaluation methodology:
+
+General Stock Data 4: 10 stocks to watch in 2017
+    -Evaluated overall performance using a combination of:
+        -Ratio of up/down days
+        -Standardized volume
+        -Total increase per stock
+
+General Stock Data 5: Sector Assesment
+    -Evaluated sector movement by using a combination of:
+        -Ratio of up/down days
+        -Standardized volume
+        -Percent increase per sector
+
+Individual Stock Data 4: Best month per year
+    -The best month for each year was selected using a combination of:
+        -Standardized volume per month
+        -Standardized average closing price per month
+        -Ratio of up and down days
+
+Individual Stock Data 5: Position on stock for given date
+    -Determined position on stock based on the combination of:
+        -Past months increase ratio
+        -Past month increase value
+        -Past year increase value
+        -Past months high
+        -Past year high
+
+Individual Stock Data 6: Check position on stock given future data
+    -Determined position on stock based on the combination of:
+        -Next 3 months increase ratio
+        -Next 3 month increase value
+        -Next 6 months increase value
+        -Next 3 months high
+        -Next 6 months high
+
+
+Individual Stock Data 7: Compare to top performing stocks
+    -Top performing stocks were selected based on percentage increase in stock price
+
+Individual Stock Data 8: Compare to other individual stocks
+    -The better stock was selected by comparing a combination of:
+        -Overall percentage increase for 2016
+        -Ratio of increasing months to decreasing months
+        -Volume of trading
