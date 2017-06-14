@@ -629,6 +629,10 @@ public class Selector {
 				s.setString(7, ticker);
 				s.setString(8, date);
 				s.setString(9, date);
+				
+				s.setString(10, ticker);
+				s.setString(11, date);
+				s.setString(12, date);
 
 	
 				ResultSet r = s.executeQuery();
@@ -698,6 +702,9 @@ public class Selector {
 				s.setString(8, date);
 				s.setString(9, date);
 
+				s.setString(10, ticker);
+				s.setString(11, date);
+				s.setString(12, date);
 	
 				ResultSet r = s.executeQuery();
 		    	
