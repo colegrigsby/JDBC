@@ -1,5 +1,4 @@
 javac *.java j2html/*.java
-java -cp ./mysql-connector-java-5.1.18-bin.jar:. JDBC GOOG
 
 java -cp ./mysql-connector-java-5.1.18-bin.jar:. JDBC BIIB
 java -cp ./mysql-connector-java-5.1.18-bin.jar:. JDBC MDLZ

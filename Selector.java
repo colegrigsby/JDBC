@@ -668,7 +668,7 @@ public class Selector {
             + " (SELECT SUM(close-open) as dif1, MAX(high) as h1 "
             + " FROM AdjustedPrices"
             + " WHERE ticker=? "
-            + " and day<=DATE_ADD(?, INTERVAL 30 DAY) and day>?) a"
+            + " and day<=DATE_ADD(?, INTERVAL 90 DAY) and day>?) a"
             + " , "
             + " (SELECT SUM(close-open) as dif2, MAX(high) as h2 "
             + " FROM AdjustedPrices"
@@ -678,12 +678,12 @@ public class Selector {
             + " (SELECT SUM(close-open) as dif3, MAX(high) as h3 "
             + " FROM AdjustedPrices"
             + " WHERE ticker=? "
-            + " and day<=DATE_ADD(?, INTERVAL 365 DAY) and day>?) c"
+            + " and day<=DATE_ADD(?, INTERVAL 180 DAY) and day>?) c"
             + " , "
             + " (SELECT SUM(up) as upDays, SUM(down) as downDays, SUM(up)/SUM(down) as UPRATIO"
             + " FROM (SELECT day, IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down"
             + " FROM AdjustedPrices "
-            + "  WHERE ticker=? and day<=DATE_ADD(?, INTERVAL 30 DAY) and day<? "
+            + "  WHERE ticker=? and day<=DATE_ADD(?, INTERVAL 90 DAY) and day<? "
             + " GROUP BY day) a ) d ; ";
         
 	        PreparedStatement s;
