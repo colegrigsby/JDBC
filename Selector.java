@@ -618,17 +618,17 @@ public class Selector {
 			try {
 				s = conn.prepareStatement(query);
 		    
-				s.setString(0, ticker);
-				s.setString(1, date);
+				s.setString(1, ticker);
 				s.setString(2, date);
+				s.setString(3, date);
 				
-				s.setString(3, ticker);
-				s.setString(4, date);
+				s.setString(4, ticker);
 				s.setString(5, date);
+				s.setString(6, date);
 				
-				s.setString(6, ticker);
-				s.setString(7, date);
+				s.setString(7, ticker);
 				s.setString(8, date);
+				s.setString(9, date);
 
 	
 				ResultSet r = s.executeQuery();
@@ -686,17 +686,17 @@ public class Selector {
 			try {
 				s = conn.prepareStatement(query);
 		    
-				s.setString(0, ticker);
-				s.setString(1, date);
+				s.setString(1, ticker);
 				s.setString(2, date);
+				s.setString(3, date);
 				
-				s.setString(3, ticker);
-				s.setString(4, date);
+				s.setString(4, ticker);
 				s.setString(5, date);
+				s.setString(6, date);
 				
-				s.setString(6, ticker);
-				s.setString(7, date);
+				s.setString(7, ticker);
 				s.setString(8, date);
+				s.setString(9, date);
 
 	
 				ResultSet r = s.executeQuery();
@@ -847,15 +847,15 @@ public class Selector {
 		try {
 			s = conn.prepareStatement(query);
 	    
-			s.setString(0, ticker1);
-			s.setString(1, year);
-			s.setString(2, ticker1);
+			s.setString(1, ticker1);
+			s.setString(2, year);
 			s.setString(3, ticker1);
+			s.setString(4, ticker1);
 			
-			s.setString(4, ticker2);
-			s.setString(5, year);
-			s.setString(6, ticker2);
+			s.setString(5, ticker2);
+			s.setString(6, year);
 			s.setString(7, ticker2);
+			s.setString(8, ticker2);
 
 			ResultSet r = s.executeQuery();
 	    	
