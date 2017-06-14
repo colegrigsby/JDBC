@@ -1,5 +1,9 @@
-//Cole Grigsby + Robert Weber 
+/*Cole Grigsby + Robert Weber 
+ * 
+ * 
+ */
 
+//j2html is utilized. From the open source project https://github.com/tipsy/j2html 
 import static j2html.TagCreator.*;
 import j2html.tags.Tag;
 
