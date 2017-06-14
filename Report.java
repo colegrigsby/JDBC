@@ -164,22 +164,18 @@ public class Report {
 	
 	}
 	
-	public void predictions(ArrayList<ArrayList<String>> data1, ArrayList<ArrayList<String>> data2, ArrayList<ArrayList<String>> data3,
-			ArrayList<ArrayList<String>> data4, ArrayList<ArrayList<String>> data5, ArrayList<ArrayList<String>> data6){
-		
-		
-		ArrayList<ArrayList<String>> pred = new ArrayList<>(); 
-		
-		
-		//TODO 
-		
+	public void predictions(ArrayList<ArrayList<String>> pred, ArrayList<ArrayList<String>> future){
+						
 		
 		List<String> head = Arrays.asList("Date", "Position"); 
 		tags.add(div(
 				p("Predictions for each date are based on the relative"
 				+ " price of the stock, how volatile it is based on the days up versus down and the overall recent "
-				+ " increases/decreases over the previous two months"),
-				top("Predictions", head, pred)
+				+ " increases/decreases over the previous two months").withStyle("display: inline-block;"), 
+				p("Outcomes are based upon the same criteria as above, but with an emphasis on "
+						+ "the increase in price.").withStyle("display: inline-block;"), 
+				top("Predictions", head, pred).withStyle("display: inline-block;"), 
+				top("results", head, future).withStyle("display: inline-block;")
 				));
 	}
 	
@@ -202,13 +198,14 @@ public class Report {
 				));
 	}
 	
-	public void compareNearby(String year, String tick2, ArrayList<ArrayList<String>> data1,ArrayList<ArrayList<String>> data2){
+	public void compareNearby(String year, String tick2, ArrayList<ArrayList<String>> data1,ArrayList<ArrayList<String>> data2, 
+			String winner){
 		List<String> head = Arrays.asList("Month", "Increase/Decrease Over the Year","", "Volume of Trading"); 
 		tags.add(div(
 				p("Compare "+ticker+" to " + tick2),
-				top("month by month for " + year + ": " + ticker, head, data1).withStyle("display: inline-block;"),
-				top("month by month for " + year + ": " + tick2, head, data2).withStyle("display: inline-block;"),
-				p("And the better performing stock is! : TODOAODS")
+				top("Month by Month for " + year + ": " + ticker, head, data1).withStyle("display: inline-block;"),
+				top(tick2, head, data2).withStyle("display: inline-block;"),
+				p("And the better performing stock is! : " + winner)
 				));
 	}
 

@@ -583,86 +583,140 @@ public class Selector {
         return tickerQuery(conn, query, 2, ticker, 8);
     }
 
-    public static ArrayList<ArrayList<String>> IndivQuery5_1(Connection conn, String ticker, String date) {
+    public static String IndivQuery5_1(Connection conn, String ticker, String date) {
         String query =
-            "SELECT SUM(up) as upDays, SUM(down) as downDays, SUM(up)/SUM(down) as UPRATIO"
+            "SELECT CASE "
+            + "	WHEN h1 < h2 and h3 > h1 and upratio > 1.2 and dif1 < dif2"
+            + " THEN 'Buy' "
+            + " WHEN h1 > h2 and h1 > h3 and upratio < 1.2 and dif1 > dif2 and dif3>0"
+            + " THEN 'Sell'"
+            + " ELSE 'Hold' "
+            + " END as Decision"
+            + " FROM "
+            + " (SELECT SUM(close-open) as dif1, MAX(high) as h1 "
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=? "
+            + " and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<?) a"
+            + " , "
+            + " (SELECT SUM(close-open) as dif2, MAX(high) as h2 "
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=? "
+            + " and day>=DATE_SUB(?, INTERVAL 60 DAY) and day<DATE_SUB(?, INTERVAL 30 DAY)) b"
+            + " , "
+            + " (SELECT SUM(close-open) as dif3, MAX(high) as h3 "
+            + " FROM AdjustedPrices"
+            + " WHERE ticker=? "
+            + " and day>=DATE_SUB(?, INTERVAL 365 DAY) and day<?) c"
+            + " , "
+            + " (SELECT SUM(up) as upDays, SUM(down) as downDays, SUM(up)/SUM(down) as UPRATIO"
             + " FROM (SELECT day, IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down"
-            + " FROM AdjustedPrices"
-            + " WHERE ticker=? and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<?"
-            + " GROUP BY day) a;";
+            + " FROM AdjustedPrices "
+            + "  WHERE ticker=? and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<? "
+            + " GROUP BY day) a ) d ; ";
+        
+	        PreparedStatement s;
+			try {
+				s = conn.prepareStatement(query);
+		    
+				s.setString(0, ticker);
+				s.setString(1, date);
+				s.setString(2, date);
+				
+				s.setString(3, ticker);
+				s.setString(4, date);
+				s.setString(5, date);
+				
+				s.setString(6, ticker);
+				s.setString(7, date);
+				s.setString(8, date);
 
-        return dateQuery(conn, query, 3, ticker, date);
+	
+				ResultSet r = s.executeQuery();
+		    	
+		        boolean check = r.next();
+				while (check) {
+						return r.getString(1);
+		            }
+	
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	
+	    	
+	    	return "FUCK"; 
+        
+        
+        
     }
-
-    public static ArrayList<ArrayList<String>> IndivQuery5_2(Connection conn, String ticker, String date) {
+            
+    
+    public static String IndivQuery6_1(Connection conn, String ticker, String date) {
         String query =
-            "SELECT SUM(close-open)"
+            "SELECT CASE "
+            + "	WHEN h1 < h2 and h3 > h2 and upratio > 1.2 and dif3 > dif1"
+            + " THEN 'Buy' "
+            + " WHEN h1 > h2 and h1 > h3 and upratio < 1.2 and dif3<0"
+            + " THEN 'Sell'"
+            + " ELSE 'Hold' "
+            + " END as Decision"
+            + " FROM "
+            + " (SELECT SUM(close-open) as dif1, MAX(high) as h1 "
             + " FROM AdjustedPrices"
-            + " WHERE ticker=?"
-            + " and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<?"
-            + " ;";
-
-        return dateQuery(conn, query, 1, ticker, date);
-    }
-
-    public static ArrayList<ArrayList<String>> IndivQuery5_3(Connection conn, String ticker, String date) {
-        String query =
-            "SELECT SUM(close-open)"
+            + " WHERE ticker=? "
+            + " and day<=DATE_ADD(?, INTERVAL 30 DAY) and day>?) a"
+            + " , "
+            + " (SELECT SUM(close-open) as dif2, MAX(high) as h2 "
             + " FROM AdjustedPrices"
-            + " WHERE ticker=?"
-            + " and day>=DATE_SUB(?, INTERVAL 60 DAY) and day<DATE_SUB(?, INTERVAL 30 DAY)"
-            + " ;";
-
-        return dateQuery(conn, query, 1, ticker, date);
-    }
-
-    public static ArrayList<ArrayList<String>> IndivQuery5_4(Connection conn, String ticker, String date) {
-        String query =
-            "SELECT MAX(high)"
+            + " WHERE ticker=? "
+            + " and day<=DATE_ADD(?, INTERVAL 60 DAY) and day>DATE_ADD(?, INTERVAL 30 DAY)) b"
+            + " , "
+            + " (SELECT SUM(close-open) as dif3, MAX(high) as h3 "
             + " FROM AdjustedPrices"
-            + " WHERE ticker=?"
-            + " and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<?"
-            + " ;";
+            + " WHERE ticker=? "
+            + " and day<=DATE_ADD(?, INTERVAL 365 DAY) and day>?) c"
+            + " , "
+            + " (SELECT SUM(up) as upDays, SUM(down) as downDays, SUM(up)/SUM(down) as UPRATIO"
+            + " FROM (SELECT day, IF(close>open, 1, 0) as up, IF(close>open, 0, 1) as down"
+            + " FROM AdjustedPrices "
+            + "  WHERE ticker=? and day<=DATE_ADD(?, INTERVAL 30 DAY) and day<? "
+            + " GROUP BY day) a ) d ; ";
+        
+	        PreparedStatement s;
+			try {
+				s = conn.prepareStatement(query);
+		    
+				s.setString(0, ticker);
+				s.setString(1, date);
+				s.setString(2, date);
+				
+				s.setString(3, ticker);
+				s.setString(4, date);
+				s.setString(5, date);
+				
+				s.setString(6, ticker);
+				s.setString(7, date);
+				s.setString(8, date);
 
-
-        return dateQuery(conn, query, 1, ticker, date);
+	
+				ResultSet r = s.executeQuery();
+		    	
+		        boolean check = r.next();
+				while (check) {
+						return r.getString(1);
+		            }
+	
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	
+	    	
+	    	return "FUCK"; 
+        
+        
+        
     }
-
-    public static ArrayList<ArrayList<String>> IndivQuery5_5(Connection conn, String ticker, String date) {
-        String query =
-            "SELECT MAX(high)"
-            + " FROM AdjustedPrices"
-            + " WHERE ticker=?"
-            + " and day>=DATE_SUB(?, INTERVAL 30 DAY) and day<DATE_SUB(?, INTERVAL 30 DAY)"
-            + " ;";
-
-
-        return dateQuery(conn, query, 1, ticker, date);
-    }
-
-    public static ArrayList<ArrayList<String>> IndivQuery5_6(Connection conn, String ticker, String date) {
-        String query =
-            "SELECT MAX(high)"
-            + " FROM AdjustedPrices"
-            + " WHERE ticker=?"
-            + " and day>=DATE_SUB(?, INTERVAL 365 DAY) and day<?"
-            + " ;";
-
-
-        return dateQuery(conn, query, 1, ticker, date);
-    }
-
-    public static ArrayList<ArrayList<String>> IndivQuery6_1(Connection conn, String ticker, String date) {
-        String query =
-            "SELECT SUM(close-open)"
-            + " FROM AdjustedPrices"
-            + " WHERE ticker=?"
-            + " and day<=DATE_ADD(?, INTERVAL 90 DAY) and day>?"
-            + " ;";
-
-        return dateQuery(conn, query, 1, ticker, date);
-    }
-
     public static ArrayList<ArrayList<String>> IndivQuery6_2(Connection conn, String ticker, String date) {
         String query =
             "SELECT SUM(close-open)"
@@ -752,12 +806,12 @@ public class Selector {
         return tickerQuery(conn, query, 5, ticker, 0);
     }
 
-    public static ArrayList<ArrayList<String>> IndivQuery8(Connection conn, String ticker) {
+    public static ArrayList<ArrayList<String>> IndivQuery8(Connection conn, String ticker, String year) {
         String query =
             "SELECT MONTHNAME(STR_TO_DATE(month, '%m')), P2.close-P1.open as inc2016, IF(P2.close>P1.close, 'Inc', 'Dec') as inc, vol"
             + " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
             + " FROM AdjustedPrices P"
-            + " WHERE Ticker=? and YEAR(day)=2016"
+            + " WHERE Ticker=? and YEAR(day)=" + year
             + " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
             + " WHERE P1.Day = Y.Min"
             + " AND P2.Day = Y.Max"
@@ -766,6 +820,58 @@ public class Selector {
 
 
         return tickerQuery(conn, query, 4, ticker, 3);
+    }
+    
+    public static String IndivQuery8_1(Connection conn, String ticker1, String ticker2, String year){
+    	String query = 
+    			"SELECT IF(IF(SUM(a.inc2016)/SUM(b.inc2016)>1, 1, 0) + IF(SUM(a.inc)/SUM(b.inc)>1,1,0) + IF(SUM(a.vol)/SUM(b.vol)>1, 1, 0) > 2, a.ticker, b.ticker)"
+    			+ " FROM "
+    			+ " (SELECT P1.ticker, month, (P2.close-P1.open)/P1.open as inc2016, IF(P2.close>P1.close, 1, 0) as inc, vol"
+    			+ " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol "
+    			+ " FROM AdjustedPrices P "
+    			+ " WHERE Ticker=? and YEAR(day)=?"
+    			+ " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
+    			+ " WHERE P1.Day = Y.Min"
+    			+ " AND P2.Day = Y.Max"
+    			+ " AND P1.Ticker=? and P2.Ticker=?) a,"
+    			+ " (SELECT P1.ticker, month, (P2.close-P1.open)/P1.open as inc2016, IF(P2.close>P1.close, 1, 0) as inc, vol"
+    			+ " FROM (SELECT MONTH(day) as month, MIN(Day) AS Min, MAX(Day) AS Max, SUM(Volume) as vol"
+    			+ " FROM AdjustedPrices P"
+    			+ " WHERE Ticker=? and YEAR(day)=?" 
+    			+ " GROUP BY month) as Y, AdjustedPrices P1, AdjustedPrices P2"
+    			+ " WHERE P1.Day = Y.Min"
+    			+ " AND P2.Day = Y.Max"
+    			+ " AND P1.Ticker=? and P2.Ticker=?) b;"; 
+    	
+    	PreparedStatement s;
+		try {
+			s = conn.prepareStatement(query);
+	    
+			s.setString(0, ticker1);
+			s.setString(1, year);
+			s.setString(2, ticker1);
+			s.setString(3, ticker1);
+			
+			s.setString(4, ticker2);
+			s.setString(5, year);
+			s.setString(6, ticker2);
+			s.setString(7, ticker2);
+
+			ResultSet r = s.executeQuery();
+	    	
+	        boolean check = r.next();
+			while (check) {
+					return r.getString(1);
+	            }
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	
+    	return "FUCK"; 
+    	
     }
 
 }

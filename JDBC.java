@@ -172,26 +172,32 @@ public class JDBC {
 		//5 
 		List<String> dates = Arrays.asList("2015-01-01", "2015-06-01", "2015-10-01",
 				"2016-01-01","2015-05-01","2015-10-01");
+		ArrayList<ArrayList<String>> pred = new ArrayList<>();
 		for (String date: dates){
-			//TODO 
-			//r.predictions(Selector.IndivQuery5_1(conn, ticker, date));
-			
+			ArrayList<String> ro = new ArrayList<>();
+			ro.add(date);
+			ro.add(Selector.IndivQuery5_1(conn, ticker, date));
+			pred.add(ro);
 		}
 		
 		// 6
-		//r.outcomes(data);
+		ArrayList<ArrayList<String>> res = new ArrayList<>();
 		for (String date: dates){
-			//TODO 
-			//r.outcomes(Selector.IndivQuery6_1(conn, ticker, date));
-			
+			ArrayList<String> ro = new ArrayList<>();
+			ro.add(date);
+			ro.add(Selector.IndivQuery6_1(conn, ticker, date));
+			res.add(ro);
 		}
+		r.predictions(pred, res);
 		
 		//7
 		r.compareTop(fullYear, Selector.IndivQuery7_1(conn, ticker, fullYear), Selector.IndivQuery7_2(conn, ticker, fullYear));
 		
 		// 8
-		String ticker2 = "UAL";
-		r.compareNearby(fullYear, ticker2, Selector.IndivQuery8(conn, ticker),Selector.IndivQuery8(conn, ticker2));
+		String ticker2 = ticker.equals("UAL") ? "BIIB" :"UAL" ;
+		String y = Selector.getFullYearTwoStock(conn, ticker, ticker2);
+		r.compareNearby(y, ticker2, Selector.IndivQuery8(conn, ticker, y),Selector.IndivQuery8(conn, ticker2,y)
+				, Selector.IndivQuery8_1(conn, ticker, ticker2, y));
 		
 		r.writeFile();
 		
